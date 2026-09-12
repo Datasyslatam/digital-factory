@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Bootcamp Digital Factory 2026 - SENA Regional Atlántico. IA, Automatización, Productividad e Industria 4.0 en el Nodo TIC Barranquilla.">
+  <title>BOOTCAMP DIGITAL FACTORY 2026 | SENA</title>
+  
+  <!-- Tipografías Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700;900&display=swap" rel="stylesheet">
+  
+  <!-- Iconos FontAwesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- Hoja de Estilos Externa -->
+  <link rel="stylesheet" href="styles/style.css">
+</head>
+<body>
+
+  <!-- Malla de micropuntos de fondo tecnológico -->
+  <div class="bg-grid-dots" aria-hidden="true"></div>
+
+  <!-- ==========================================================================
+       SECCIÓN 1: CABECERA Y HERO BANNER (DISTRIBUCIÓN ASIMÉTRICA SEGÚN ESQUEMA)
+       ========================================================================== -->
+  <header class="container hero-container">
+    <nav class="navbar">
+      <div class="nav-brand">
+        <div class="badge-pill">
+          <span class="pulse-dot"></span>
+          <span>Evento Oficial 2026</span>
+        </div>
+      </div>
+
+      <!-- Logo Oficial del SENA en la esquina superior derecha -->
+      <a href="#inicio" class="sena-logo-box" aria-label="Logo Oficial SENA Regional Atlántico">
+        <div class="sena-logo-sub">
+          <div class="regional">Regional Atlántico</div>
+          <div class="nodo">Centro Nacional Colombo Alemán &bull; Nodo TIC</div>
+        </div>
+        <img src="source/logo del sena.png" onerror="this.src='logo del sena.png'" alt="Logo SENA Oficial" class="sena-logo-img">
+      </a>
+    </nav>
+
+    <!-- Banner Principal Asimétrico: Contenedor Media Luna / Semicírculo a la Izquierda y Video a la Derecha -->
+    <div class="hero-layout-section" id="inicio">
+      <div class="hero-banner-card">
+        
+        <!-- 1. Contenedor de Información (Forma Media Luna / Semicírculo con borde amarillo neón) -->
+        <div class="hero-crescent-container">
+          <span class="hero-pretitle">SENA REGIONAL ATLÁNTICO</span>
+          
+          <h1 class="hero-main-title">
+            <span class="title-white">BOOTCAMP</span>
+            <span class="title-yellow">DIGITAL FACTORY</span>
+            <span class="title-year">2026</span>
+          </h1>
+
+          <div class="hero-crescent-actions">
+            <!-- Botón de acción principal: "¡Vive la experiencia!" -->
+            <a href="#informacion" class="btn-action-primary">
+              <i class="fa-solid fa-sparkles"></i> ¡Vive la experiencia!
+            </a>
+
+            <!-- Botón secundario: "INSCRIBIRME AHORA ->" -->
+            <a href="#registro" class="btn-action-secondary">
+              <span>INSCRIBIRME AHORA</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- 2. Contenedor de Video (Ocupa todo el espacio restante con esquinas redondeadas y borde brillante) -->
+        <div class="hero-video-wrapper">
+          <div class="hero-video-frame">
+            <video 
+              id="bootcampVideo"
+              autoplay 
+              muted 
+              loop 
+              playsinline 
+              poster="source/informacion.png"
+              title="Actividades del Bootcamp Digital Factory SENA 2026"
+            >
+              <source src="source/video_actividades.mp4" type="video/mp4">
+              <source src="video_actividades.mp4" type="video/mp4">
+              Tu navegador no soporta el elemento de video.
+            </video>
+
+            <!-- Solo control de audio accesible (SIN ningún mensaje de texto como fue solicitado) -->
+            <div class="video-audio-corner">
+              <button id="toggleAudioBtn" class="btn-audio-toggle" type="button" aria-label="Alternar audio del video">
+                <i class="fa-solid fa-volume-xmark" id="audioIcon"></i>
+                <span id="audioText">Activar Audio</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Menú Rodante Continuo (Ticker) entre el Video y la Información -->
+  <section class="rolling-ticker-section" aria-label="Menú rodante de temáticas institucionales">
+    <div class="rolling-ticker-track">
+      <!-- Grupo 1 -->
+      <div class="ticker-group">
+        <span class="ticker-text-neon"><i class="fa-solid fa-brain"></i> IA</span>
+        <span class="ticker-bullet">•</span>
+        <span class="ticker-text-neon"><i class="fa-solid fa-gears"></i> AUTOMATIZACIÓN</span>
+        <span class="ticker-bullet">•</span>
+        <span class="ticker-text-neon"><i class="fa-solid fa-chart-line"></i> PRODUCTIVIDAD</span>
+        <span class="ticker-bullet">•</span>
+        <span class="ticker-text-neon"><i class="fa-solid fa-industry"></i> INDUSTRIA 4.0</span>
+        <span class="ticker-bullet">•</span>
+        <div class="ticker-social-group">
+          <div class="social-icons-row">
+            <i class="fa-brands fa-x-twitter"></i>
+            <i class="fa-brands fa-instagram"></i>
+            <i class="fa-brands fa-facebook-f"></i>
+          </div>
+          <span>@SENAATLÁNTICO</span>
+        </div>
+        <span class="ticker-bullet">•</span>
+        <span class="ticker-tag-pill">NODO TIC BARRANQUILLA</span>
+        <span class="ticker-bullet">•</span>
+        <span class="ticker-tag-pill">22 Y 23 DE SEPTIEMBRE 2026</span>
+        <span class="ticker-bullet">•</span>
+        <span class="ticker-text-neon"><i class="fa-solid fa-microchip"></i> DIGITAL FACTORY</span>
+        <span class="ticker-bullet">•</span>
+      </div>
+
+      <!-- Grupo 2 (Duplicado idéntico para loop continuo a 60fps) -->
+      <div class="ticker-group" aria-hidden="true">
+        <span class="ticker-text-neon"><i class="fa-solid fa-brain"></i> IA</span>
+        <span class="ticker-bullet">•</span>
+        <span class="ticker-text-neon"><i class="fa-solid fa-gears"></i> AUTOMATIZACIÓN</span>
+        <span class="ticker-bullet">•</span>
+        <span class="ticker-text-neon"><i class="fa-solid fa-chart-line"></i> PRODUCTIVIDAD</span>
+        <span class="ticker-bullet">•</span>
+        <span class="ticker-text-neon"><i class="fa-solid fa-industry"></i> INDUSTRIA 4.0</span>
+        <span class="ticker-bullet">•</span>
+        <div class="ticker-social-group">
+          <div class="social-icons-row">
+            <i class="fa-brands fa-x-twitter"></i>
+            <i class="fa-brands fa-instagram"></i>
+            <i class="fa-brands fa-facebook-f"></i>
+          </div>
+          <span>@SENAATLÁNTICO</span>
+        </div>
+        <span class="ticker-bullet">•</span>
+        <span class="ticker-tag-pill">NODO TIC BARRANQUILLA</span>
+        <span class="ticker-bullet">•</span>
+        <span class="ticker-tag-pill">22 Y 23 DE SEPTIEMBRE 2026</span>
+        <span class="ticker-bullet">•</span>
+        <span class="ticker-text-neon"><i class="fa-solid fa-microchip"></i> DIGITAL FACTORY</span>
+        <span class="ticker-bullet">•</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       SECCIÓN 2: INFORMACIÓN DEL EVENTO
+       ========================================================================== -->
+  <main>
+    <section class="section-info" id="informacion">
+      <div class="container">
+        
+        <!-- Lema Oficial Centrado -->
+        <div class="slogan-card">
+          <h2 class="slogan-title">
+            ¿Tienes un reto en tu proceso productivo?
+          </h2>
+          <div style="margin-top: 6px;">
+            <span class="slogan-action">Tráelo.</span>
+            <p class="slogan-desc">
+              Nuestros aprendices lo convierten en una <strong>solución digital</strong> de alto impacto.
+            </p>
+          </div>
+        </div>
+
+        <!-- Cuadrícula con la Información Clave (Fecha, Horario, Ubicación) -->
+        <div class="info-grid">
+          
+          <!-- Tarjeta Fecha -->
+          <article class="info-card">
+            <div>
+              <div class="card-header">
+                <div class="card-icon-wrap">
+                  <i class="fa-regular fa-calendar-days"></i>
+                </div>
+                <div>
+                  <div class="card-label">Fechas Oficiales</div>
+                  <div class="card-main-val highlight-neon">22 y 23</div>
+                </div>
+              </div>
+              <p class="card-subtext">
+                Septiembre de 2026. Dos jornadas de inmersión tecnológica intensiva, prototipado rápido y soluciones 4.0.
+              </p>
+            </div>
+            <div class="badge-pill" style="margin-top: 18px; align-self: flex-start;">
+              <i class="fa-solid fa-bolt"></i> 48 Horas de Reto
+            </div>
+          </article>
+
+          <!-- Tarjeta Horario -->
+          <article class="info-card">
+            <div>
+              <div class="card-header">
+                <div class="card-icon-wrap">
+                  <i class="fa-regular fa-clock"></i>
+                </div>
+                <div>
+                  <div class="card-label">Jornada</div>
+                  <div class="card-main-val">8:00 a.m.</div>
+                </div>
+              </div>
+              <p class="card-subtext">
+                A 6:00 p.m. cada día. Incluye talleres aplicados, mentorías especializadas con expertos y demostraciones en vivo.
+              </p>
+            </div>
+            <div class="badge-pill" style="margin-top: 18px; align-self: flex-start;">
+              <i class="fa-solid fa-hourglass-half"></i> Jornada Continua
+            </div>
+          </article>
+
+          <!-- Tarjeta Ubicación -->
+          <article class="info-card">
+            <div>
+              <div class="card-header">
+                <div class="card-icon-wrap">
+                  <i class="fa-solid fa-location-dot"></i>
+                </div>
+                <div>
+                  <div class="card-label">Sede del Evento</div>
+                  <div class="card-main-val highlight-neon">Nodo TIC</div>
+                </div>
+              </div>
+              <p class="card-subtext">
+                Cra. 54 # 68-80, Barranquilla, Atlántico. Infraestructura especializada de última generación tecnológica del SENA.
+              </p>
+            </div>
+            <a href="https://maps.google.com/?q=Nodo+TIC+SENA+Cra+54+Barranquilla" target="_blank" rel="noopener noreferrer" class="location-link">
+              Ver ubicación en Google Maps <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            </a>
+          </article>
+
+        </div>
+
+        <!-- Contador Regresivo Interactivo -->
+        <div class="countdown-container">
+          <div class="countdown-title">
+            <i class="fa-solid fa-stopwatch highlight-neon"></i>
+            <span>Cuenta regresiva para el lanzamiento oficial:</span>
+          </div>
+          <div class="countdown-boxes">
+            <div class="c-box">
+              <div class="c-number" id="cdDays">00</div>
+              <div class="c-label">Días</div>
+            </div>
+            <div class="c-box">
+              <div class="c-number" id="cdHours">00</div>
+              <div class="c-label">Horas</div>
+            </div>
+            <div class="c-box">
+              <div class="c-number" id="cdMinutes">00</div>
+              <div class="c-label">Min</div>
+            </div>
+            <div class="c-box">
+              <div class="c-number" id="cdSeconds">00</div>
+              <div class="c-label">Seg</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pilares Tecnológicos -->
+        <div class="pillars-strip">
+          <span class="pillar-tag"><i class="fa-solid fa-brain"></i> Inteligencia Artificial</span>
+          <span class="pillar-tag"><i class="fa-solid fa-gears"></i> Automatización Industrial</span>
+          <span class="pillar-tag"><i class="fa-solid fa-chart-line"></i> Productividad Empresarial</span>
+          <span class="pillar-tag"><i class="fa-solid fa-industry"></i> Industria 4.0</span>
+          <span class="pillar-tag"><i class="fa-solid fa-microchip"></i> Gemelos Digitales &amp; Robótica</span>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         SECCIÓN 3: FORMULARIO DINÁMICO CON JAVASCRIPT
+         ========================================================================== -->
+    <section class="section-registration" id="registro">
+      <div class="container">
+        
+        <div class="form-wrapper">
+          <div class="form-header">
+            <div class="badge-pill" style="margin-bottom: 12px;">
+              <i class="fa-solid fa-user-plus"></i> Cupos Limitados
+            </div>
+            <h2 class="form-title">¡Inscríbete ahora!</h2>
+            <p class="form-subtitle">
+              Selecciona tu tipo de vinculación y completa el formulario para asegurar tu cupo en el Bootcamp Digital Factory 2026.
+            </p>
+          </div>
+
+          <form id="bootcampForm" novalidate>
+            
+            <!-- Selector de Rol (Tabs Visuales y <select> sincronizados) -->
+            <div class="role-selection-group">
+              <label for="roleSelector" class="role-label-title">
+                <i class="fa-solid fa-id-badge"></i> Selecciona tu Rol de Participación
+              </label>
+
+              <div class="role-options-grid" role="radiogroup" aria-label="Seleccionar rol">
+                <label class="role-card-option">
+                  <input type="radio" name="roleRadio" value="Aprendiz" id="radioAprendiz" checked>
+                  <div class="role-card-content">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <span>Aprendiz SENA</span>
+                  </div>
+                </label>
+                
+                <label class="role-card-option">
+                  <input type="radio" name="roleRadio" value="Invitado" id="radioInvitado">
+                  <div class="role-card-content">
+                    <i class="fa-solid fa-building-user"></i>
+                    <span>Invitado / Empresa</span>
+                  </div>
+                </label>
+              </div>
+
+              <div class="select-dropdown-container">
+                <select id="roleSelector" name="role" class="custom-select" aria-label="Selector de Rol de participante">
+                  <option value="Aprendiz" selected>Rol: Aprendiz</option>
+                  <option value="Invitado">Rol: Invitado</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Contenedor dinámico controlado por JavaScript -->
+            <div class="form-fields-container" id="dynamicFieldsArea">
+              
+              <!-- GRUPO APRENDIZ (Visible por defecto) -->
+              <div id="fieldsAprendiz" class="dynamic-fieldset">
+                
+                <!-- Número de Ficha -->
+                <div class="input-group" id="grpFicha">
+                  <label for="numFicha">
+                    <span>Número de Ficha</span> <span class="req">*</span>
+                  </label>
+                  <div class="input-wrapper">
+                    <i class="fa-solid fa-hashtag"></i>
+                    <input 
+                      type="text" 
+                      id="numFicha" 
+                      name="numFicha" 
+                      class="form-control" 
+                      placeholder="Ej: 2874912"
+                      required
+                    >
+                  </div>
+                  <span class="input-error-msg">Por favor ingresa el número de tu ficha formativa.</span>
+                </div>
+
+                <!-- Nombre Completo -->
+                <div class="input-group" id="grpNombreAprendiz">
+                  <label for="nombreAprendiz">
+                    <span>Nombre Completo</span> <span class="req">*</span>
+                  </label>
+                  <div class="input-wrapper">
+                    <i class="fa-solid fa-user"></i>
+                    <input 
+                      type="text" 
+                      id="nombreAprendiz" 
+                      name="nombreAprendiz" 
+                      class="form-control" 
+                      placeholder="Ej: María Camila González"
+                      required
+                    >
+                  </div>
+                  <span class="input-error-msg">Por favor escribe tu nombre completo.</span>
+                </div>
+
+                <!-- Cédula -->
+                <div class="input-group" id="grpCedulaAprendiz">
+                  <label for="cedulaAprendiz">
+                    <span>Cédula o Documento de Identidad</span> <span class="req">*</span>
+                  </label>
+                  <div class="input-wrapper">
+                    <i class="fa-solid fa-address-card"></i>
+                    <input 
+                      type="text" 
+                      id="cedulaAprendiz" 
+                      name="cedulaAprendiz" 
+                      class="form-control" 
+                      placeholder="Ej: 1042456789"
+                      inputmode="numeric"
+                      required
+                    >
+                  </div>
+                  <span class="input-error-msg">Ingresa un número de documento válido.</span>
+                </div>
+
+                <!-- Centro al que pertenece -->
+                <div class="input-group" id="grpCentro">
+                  <label for="centroPertenencia">
+                    <span>Centro al que pertenece</span> <span class="req">*</span>
+                  </label>
+                  <div class="input-wrapper">
+                    <i class="fa-solid fa-school"></i>
+                    <input 
+                      type="text" 
+                      id="centroPertenencia" 
+                      name="centroPertenencia" 
+                      class="form-control" 
+                      placeholder="Ej: Centro Nacional Colombo Alemán / Nodo TIC"
+                      required
+                    >
+                  </div>
+                  <span class="input-error-msg">Por favor indica el centro formativo al que perteneces.</span>
+                </div>
+
+              </div>
+
+              <!-- GRUPO INVITADO (Oculto inicialmente) -->
+              <div id="fieldsInvitado" class="dynamic-fieldset" style="display: none;">
+                
+                <!-- Empresa -->
+                <div class="input-group" id="grpEmpresa">
+                  <label for="empresaInvitado">
+                    <span>Empresa o Entidad</span> <span class="req">*</span>
+                  </label>
+                  <div class="input-wrapper">
+                    <i class="fa-solid fa-building"></i>
+                    <input 
+                      type="text" 
+                      id="empresaInvitado" 
+                      name="empresaInvitado" 
+                      class="form-control" 
+                      placeholder="Ej: Industrias del Caribe S.A.S."
+                    >
+                  </div>
+                  <span class="input-error-msg">Por favor ingresa el nombre de tu empresa u organización.</span>
+                </div>
+
+                <!-- Nombre Completo -->
+                <div class="input-group" id="grpNombreInvitado">
+                  <label for="nombreInvitado">
+                    <span>Nombre Completo</span> <span class="req">*</span>
+                  </label>
+                  <div class="input-wrapper">
+                    <i class="fa-solid fa-user-tie"></i>
+                    <input 
+                      type="text" 
+                      id="nombreInvitado" 
+                      name="nombreInvitado" 
+                      class="form-control" 
+                      placeholder="Ej: Carlos Eduardo Restrepo"
+                    >
+                  </div>
+                  <span class="input-error-msg">Por favor escribe tu nombre completo.</span>
+                </div>
+
+                <!-- Número de Cédula -->
+                <div class="input-group" id="grpCedulaInvitado">
+                  <label for="cedulaInvitado">
+                    <span>Número de Cédula</span> <span class="req">*</span>
+                  </label>
+                  <div class="input-wrapper">
+                    <i class="fa-solid fa-id-card"></i>
+                    <input 
+                      type="text" 
+                      id="cedulaInvitado" 
+                      name="cedulaInvitado" 
+                      class="form-control" 
+                      placeholder="Ej: 72154890"
+                      inputmode="numeric"
+                    >
+                  </div>
+                  <span class="input-error-msg">Ingresa un número de cédula válido.</span>
+                </div>
+
+              </div>
+
+            </div>
+
+            <!-- Botón de Envío -->
+            <button type="submit" class="btn-submit-registration" id="btnSubmit">
+              <span>Enviar Registro</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+          </form>
+
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal / Alerta de Éxito -->
+  <div class="modal-overlay" id="successModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-card">
+      <div class="modal-icon-badge">
+        <i class="fa-solid fa-check"></i>
+      </div>
+      <h3 class="modal-title" id="modalTitle">¡Registro Exitoso!</h3>
+      <p class="modal-body-text" id="modalMsg">
+        Tu solicitud de participación en el <strong>BOOTCAMP DIGITAL FACTORY 2026</strong> ha sido recibida y confirmada satisfactoriamente.
+      </p>
+
+      <div class="modal-details-summary" id="modalSummaryContent">
+        <!-- Resumen dinámico JS -->
+      </div>
+
+      <button type="button" class="btn-modal-close" id="btnCloseModal">
+        Aceptar y Finalizar
+      </button>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       SECCIÓN 4: PIE DE PÁGINA (FOOTER)
+       ========================================================================== -->
+  <footer class="site-footer">
+    <div class="container">
+      
+      <div class="footer-top">
+        <div>
+          <div class="footer-brand-title">
+            <span class="highlight-neon">BOOTCAMP</span>
+            <span>DIGITAL FACTORY 2026</span>
+          </div>
+          <p class="footer-text-inst">
+            Iniciativa estratégica del SENA Regional Atlántico y el Nodo TIC para acelerar la transformación productiva de la región mediante tecnologías de Automatización Avanzada, Inteligencia Artificial y Productividad 4.0.
+          </p>
+          <div class="tech-pills-footer">
+            <span>Industria 4.0</span>
+            <span>Automatización</span>
+            <span>Productividad</span>
+            <span>Inteligencia Artificial</span>
+            <span>Internet de las Cosas</span>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="footer-heading">Sede del Evento</h4>
+          <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 12px;">
+            <strong style="color: #fff;">Nodo TIC Barranquilla</strong><br>
+            Cra. 54 # 68-80<br>
+            Barranquilla, Colombia
+          </p>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">
+            Horario: 8:00 a.m. - 6:00 p.m.<br>
+            22 y 23 de Septiembre 2026
+          </p>
+        </div>
+
+        <div>
+          <h4 class="footer-heading">SENA Atlántico</h4>
+          <ul class="social-links-list">
+            <li>
+              <a href="https://facebook.com/SENAAtlantico" target="_blank" rel="noopener noreferrer" class="social-link-item">
+                <i class="fa-brands fa-facebook-f"></i>
+                <span>Facebook Oficial</span>
+              </a>
+            </li>
+            <li>
+              <a href="https://instagram.com/SENAAtlantico" target="_blank" rel="noopener noreferrer" class="social-link-item">
+                <i class="fa-brands fa-instagram"></i>
+                <span>@SENAAtlantico</span>
+              </a>
+            </li>
+            <li>
+              <a href="https://twitter.com/SENAAtlantico" target="_blank" rel="noopener noreferrer" class="social-link-item">
+                <i class="fa-brands fa-x-twitter"></i>
+                <span>X / Twitter</span>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.sena.edu.co" target="_blank" rel="noopener noreferrer" class="social-link-item">
+                <i class="fa-solid fa-globe"></i>
+                <span>Portal www.sena.edu.co</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom-bar">
+        <div>
+          &copy; 2026 Servicio Nacional de Aprendizaje (SENA) &bull; Regional Atlántico. Todos los derechos reservados.
+        </div>
+        <div>
+          Construyendo país con innovación, ciencia y tecnología aplicada.
+        </div>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- Lógica y Funcionalidad JavaScript Externa -->
+  <script src="scripts/script.js"></script>
+</body>
+</html>
