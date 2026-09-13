@@ -1,6 +1,15 @@
+/* ==========================================================================
+   CONFIGURACIÓN DEL BACKEND (Google Apps Script + Google Sheets)
+   --------------------------------------------------------------------------
+   1. Sigue las instrucciones de INSTRUCCIONES.md para crear la Google Sheet
+      y desplegar el Apps Script (google-apps-script/Code.gs) como aplicación
+      web.
+   2. Pega aquí la URL que te entrega el despliegue (termina en /exec).
+   ========================================================================== */
+const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwW391OHJwEmWZGkapvqa8HQ24AW6c6XGDEBWV6NUpi2PdlvCIWh7UR2cxu9CAolEXu/exec';
+
 document.addEventListener('DOMContentLoaded', () => {
   // 1. Manejo dinámico de roles
-  const roleSelector = document.getElementById('roleSelector');
   const radioAprendiz = document.getElementById('radioAprendiz');
   const radioInvitado = document.getElementById('radioInvitado');
   
@@ -11,62 +20,76 @@ document.addEventListener('DOMContentLoaded', () => {
   const successModal = document.getElementById('successModal');
   const btnCloseModal = document.getElementById('btnCloseModal');
   const modalSummaryContent = document.getElementById('modalSummaryContent');
+  const formAlert = document.getElementById('formAlert');
+  const formAlertText = document.getElementById('formAlertText');
+  const btnSubmit = document.getElementById('btnSubmit');
+  const btnSubmitText = document.getElementById('btnSubmitText');
+  const btnSubmitIcon = document.getElementById('btnSubmitIcon');
 
   // Inputs Aprendiz
   const numFicha = document.getElementById('numFicha');
   const nombreAprendiz = document.getElementById('nombreAprendiz');
+  const tipoDocAprendiz = document.getElementById('tipoDocAprendiz');
   const cedulaAprendiz = document.getElementById('cedulaAprendiz');
+  const correoAprendiz = document.getElementById('correoAprendiz');
   const centroPertenencia = document.getElementById('centroPertenencia');
 
   // Inputs Invitado
   const empresaInvitado = document.getElementById('empresaInvitado');
   const nombreInvitado = document.getElementById('nombreInvitado');
+  const tipoDocInvitado = document.getElementById('tipoDocInvitado');
   const cedulaInvitado = document.getElementById('cedulaInvitado');
+  const correoInvitado = document.getElementById('correoInvitado');
+
+  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   function setRole(role) {
     if (role === 'Aprendiz') {
       if (fieldsAprendiz) fieldsAprendiz.style.display = 'flex';
       if (fieldsInvitado) fieldsInvitado.style.display = 'none';
 
-      if (roleSelector) roleSelector.value = 'Aprendiz';
       if (radioAprendiz) radioAprendiz.checked = true;
 
       if (numFicha) numFicha.setAttribute('required', 'true');
       if (nombreAprendiz) nombreAprendiz.setAttribute('required', 'true');
+      if (tipoDocAprendiz) tipoDocAprendiz.setAttribute('required', 'true');
       if (cedulaAprendiz) cedulaAprendiz.setAttribute('required', 'true');
+      if (correoAprendiz) correoAprendiz.setAttribute('required', 'true');
       if (centroPertenencia) centroPertenencia.setAttribute('required', 'true');
 
       if (empresaInvitado) empresaInvitado.removeAttribute('required');
       if (nombreInvitado) nombreInvitado.removeAttribute('required');
+      if (tipoDocInvitado) tipoDocInvitado.removeAttribute('required');
       if (cedulaInvitado) cedulaInvitado.removeAttribute('required');
+      if (correoInvitado) correoInvitado.removeAttribute('required');
 
       if (fieldsInvitado) clearErrors(fieldsInvitado);
     } else {
       if (fieldsAprendiz) fieldsAprendiz.style.display = 'none';
       if (fieldsInvitado) fieldsInvitado.style.display = 'flex';
 
-      if (roleSelector) roleSelector.value = 'Invitado';
       if (radioInvitado) radioInvitado.checked = true;
 
-      if (empresaInvitado) empresaInvitado.setAttribute('required', 'true');
       if (nombreInvitado) nombreInvitado.setAttribute('required', 'true');
+      if (tipoDocInvitado) tipoDocInvitado.setAttribute('required', 'true');
       if (cedulaInvitado) cedulaInvitado.setAttribute('required', 'true');
+      if (correoInvitado) correoInvitado.setAttribute('required', 'true');
 
       if (numFicha) numFicha.removeAttribute('required');
       if (nombreAprendiz) nombreAprendiz.removeAttribute('required');
+      if (tipoDocAprendiz) tipoDocAprendiz.removeAttribute('required');
       if (cedulaAprendiz) cedulaAprendiz.removeAttribute('required');
+      if (correoAprendiz) correoAprendiz.removeAttribute('required');
       if (centroPertenencia) centroPertenencia.removeAttribute('required');
 
       if (fieldsAprendiz) clearErrors(fieldsAprendiz);
     }
+
+    if (formAlert) formAlert.classList.remove('active');
   }
 
   function clearErrors(container) {
     container.querySelectorAll('.input-group').forEach(grp => grp.classList.remove('has-error'));
-  }
-
-  if (roleSelector) {
-    roleSelector.addEventListener('change', (e) => setRole(e.target.value));
   }
 
   if (radioAprendiz) {
@@ -84,81 +107,145 @@ document.addEventListener('DOMContentLoaded', () => {
   setRole('Aprendiz');
 
   document.querySelectorAll('.form-control').forEach(input => {
-    input.addEventListener('input', () => {
-      const group = input.closest('.input-group');
-      if (group && input.value.trim() !== '') {
-        group.classList.remove('has-error');
-      }
+    ['input', 'change'].forEach(evt => {
+      input.addEventListener(evt, () => {
+        const group = input.closest('.input-group');
+        if (group && input.value.trim() !== '') {
+          group.classList.remove('has-error');
+        }
+      });
     });
   });
 
+  function setSubmitLoading(isLoading) {
+    if (!btnSubmit) return;
+    btnSubmit.disabled = isLoading;
+    if (btnSubmitText) btnSubmitText.textContent = isLoading ? 'Enviando registro...' : 'Enviar Registro';
+    if (btnSubmitIcon) btnSubmitIcon.className = isLoading ? 'fa-solid fa-spinner' : 'fa-solid fa-arrow-right';
+  }
+
+  function showFormError(message) {
+    if (!formAlert) return;
+    if (formAlertText) formAlertText.textContent = message;
+    formAlert.classList.add('active');
+  }
+
   // Validación y Envío
   if (bootcampForm) {
-    bootcampForm.addEventListener('submit', (e) => {
+    bootcampForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const currentRole = roleSelector ? roleSelector.value : 'Aprendiz';
+      if (formAlert) formAlert.classList.remove('active');
+
+      const currentRole = (radioInvitado && radioInvitado.checked) ? 'Invitado' : 'Aprendiz';
       let isValid = true;
       let summaryData = {};
+      let payload = { role: currentRole };
 
       if (currentRole === 'Aprendiz') {
         const inputs = [
-          { el: numFicha, key: 'Número de Ficha' },
-          { el: nombreAprendiz, key: 'Nombre Completo' },
-          { el: cedulaAprendiz, key: 'Cédula / Documento' },
-          { el: centroPertenencia, key: 'Centro SENA' }
+          { el: numFicha, key: 'Número de Ficha', field: 'numFicha' },
+          { el: nombreAprendiz, key: 'Nombre Completo', field: 'nombreCompleto' },
+          { el: tipoDocAprendiz, key: 'Tipo de Documento', field: 'tipoDocumento' },
+          { el: cedulaAprendiz, key: 'Número de Documento', field: 'numeroDocumento' },
+          { el: correoAprendiz, key: 'Correo Electrónico', field: 'correo' },
+          { el: centroPertenencia, key: 'Centro SENA', field: 'centro' }
         ];
 
         inputs.forEach(item => {
           if (!item.el) return;
           const val = item.el.value.trim();
           const grp = item.el.closest('.input-group');
-          if (!val) {
+          const isEmailField = item.el === correoAprendiz;
+          const invalid = !val || (isEmailField && !EMAIL_REGEX.test(val));
+          if (invalid) {
             isValid = false;
             if (grp) grp.classList.add('has-error');
           } else {
             if (grp) grp.classList.remove('has-error');
             summaryData[item.key] = val;
+            payload[item.field] = val;
           }
         });
       } else {
         const inputs = [
-          { el: empresaInvitado, key: 'Empresa / Entidad' },
-          { el: nombreInvitado, key: 'Nombre Completo' },
-          { el: cedulaInvitado, key: 'Cédula de Ciudadanía' }
+          { el: nombreInvitado, key: 'Nombre Completo', field: 'nombreCompleto' },
+          { el: tipoDocInvitado, key: 'Tipo de Documento', field: 'tipoDocumento' },
+          { el: cedulaInvitado, key: 'Número de Documento', field: 'numeroDocumento' },
+          { el: correoInvitado, key: 'Correo Electrónico', field: 'correo' }
         ];
 
         inputs.forEach(item => {
           if (!item.el) return;
           const val = item.el.value.trim();
           const grp = item.el.closest('.input-group');
-          if (!val) {
+          const isEmailField = item.el === correoInvitado;
+          const invalid = !val || (isEmailField && !EMAIL_REGEX.test(val));
+          if (invalid) {
             isValid = false;
             if (grp) grp.classList.add('has-error');
           } else {
             if (grp) grp.classList.remove('has-error');
             summaryData[item.key] = val;
+            payload[item.field] = val;
           }
         });
+
+        // Empresa / Entidad (opcional): solo se envía si el invitado la diligenció
+        if (empresaInvitado) {
+          const empresaVal = empresaInvitado.value.trim();
+          if (empresaVal) {
+            summaryData['Empresa / Entidad'] = empresaVal;
+            payload.empresa = empresaVal;
+          }
+        }
       }
 
       if (!isValid) {
-        const firstError = document.querySelector('.input-group.has-error input');
+        const firstError = document.querySelector('.input-group.has-error input, .input-group.has-error select');
         if (firstError) firstError.focus();
         return;
       }
 
-      // Modal de Éxito
-      if (modalSummaryContent) {
-        let summaryHTML = `<div><span class="field">Rol registrado:</span> <span class="val">${currentRole}</span></div>`;
-        for (const [key, val] of Object.entries(summaryData)) {
-          summaryHTML += `<div><span class="field">${key}:</span> <span class="val">${val}</span></div>`;
-        }
-        modalSummaryContent.innerHTML = summaryHTML;
+      if (!GAS_WEB_APP_URL || GAS_WEB_APP_URL.trim() === '' || GAS_WEB_APP_URL.indexOf('PEGA_AQUI_TU_URL') !== -1) {
+        showFormError('El formulario aún no está conectado a la base de datos. Configura GAS_WEB_APP_URL en scripts/script.js (ver INSTRUCCIONES.md).');
+        return;
       }
 
-      if (successModal) successModal.classList.add('active');
-      bootcampForm.reset();
-      setRole(currentRole);
+      setSubmitLoading(true);
+
+      try {
+        // Content-Type "text/plain" evita el preflight CORS; Apps Script igual
+        // puede leer y parsear el JSON desde e.postData.contents.
+        const response = await fetch(GAS_WEB_APP_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (!result || result.result !== 'success') {
+          throw new Error((result && result.message) || 'Respuesta inválida del servidor.');
+        }
+
+        // Modal de Éxito
+        if (modalSummaryContent) {
+          let summaryHTML = `<div><span class="field">Rol registrado:</span> <span class="val">${currentRole}</span></div>`;
+          for (const [key, val] of Object.entries(summaryData)) {
+            summaryHTML += `<div><span class="field">${key}:</span> <span class="val">${val}</span></div>`;
+          }
+          modalSummaryContent.innerHTML = summaryHTML;
+        }
+
+        if (successModal) successModal.classList.add('active');
+        bootcampForm.reset();
+        setRole(currentRole);
+      } catch (err) {
+        console.error('Error al enviar el registro:', err);
+        showFormError('No pudimos registrar tu inscripción. Verifica tu conexión e inténtalo de nuevo. Si el problema persiste, escríbenos.');
+      } finally {
+        setSubmitLoading(false);
+      }
     });
   }
 
@@ -172,27 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 2. Control de Audio del Video
-  const bootcampVideo = document.getElementById('bootcampVideo');
-  const toggleAudioBtn = document.getElementById('toggleAudioBtn');
-  const audioIcon = document.getElementById('audioIcon');
-  const audioText = document.getElementById('audioText');
-
-  if (toggleAudioBtn && bootcampVideo) {
-    toggleAudioBtn.addEventListener('click', () => {
-      if (bootcampVideo.muted) {
-        bootcampVideo.muted = false;
-        if (audioIcon) audioIcon.className = 'fa-solid fa-volume-high';
-        if (audioText) audioText.textContent = 'Silenciar';
-      } else {
-        bootcampVideo.muted = true;
-        if (audioIcon) audioIcon.className = 'fa-solid fa-volume-xmark';
-        if (audioText) audioText.textContent = 'Activar Audio';
-      }
-    });
-  }
-
-  // 3. Cuenta Regresiva
+  // 2. Cuenta Regresiva
   const eventDate = new Date('2026-09-22T08:00:00-05:00').getTime();
   const elDays = document.getElementById('cdDays');
   const elHours = document.getElementById('cdHours');

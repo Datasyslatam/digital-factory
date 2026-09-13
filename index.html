@@ -16,8 +16,16 @@
 
   <!-- Hoja de Estilos Externa -->
   <link rel="stylesheet" href="styles/style.css">
+  <link rel="stylesheet" href="styles/interactive.css">
 </head>
 <body>
+
+  <!-- Barra de Progreso de Scroll -->
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+
+  <!-- Cursor Personalizado Neon -->
+  <div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
+  <div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
 
   <!-- Malla de micropuntos de fondo tecnológico -->
   <div class="bg-grid-dots" aria-hidden="true"></div>
@@ -34,6 +42,21 @@
         </div>
       </div>
 
+      <!-- Overlay móvil -->
+      <div class="nav-overlay" id="navOverlay" aria-hidden="true"></div>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#informacion" class="nav-close-link">Información</a></li>
+        <li><a href="#registro" class="nav-close-link">Inscripción</a></li>
+      </ul>
+
+      <!-- Botón Hamburger (móvil) -->
+      <button class="nav-hamburger" id="navHamburger" aria-label="Abrir menú de navegación" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
       <!-- Logo Oficial del SENA en la esquina superior derecha -->
       <a href="#inicio" class="sena-logo-box" aria-label="Logo Oficial SENA Regional Atlántico">
         <div class="sena-logo-sub">
@@ -44,7 +67,7 @@
       </a>
     </nav>
 
-    <!-- Banner Principal Asimétrico: Contenedor Media Luna / Semicírculo a la Izquierda y Video a la Derecha -->
+    <!-- Banner Principal Asimétrico: Contenedor Media Luna a la Izquierda y Carrusel de Imágenes a la Derecha -->
     <div class="hero-layout-section" id="inicio">
       <div class="hero-banner-card">
         
@@ -53,7 +76,7 @@
           <span class="hero-pretitle">SENA REGIONAL ATLÁNTICO</span>
           
           <h1 class="hero-main-title">
-            <span class="title-white">BOOTCAMP</span>
+            <span class="title-white glitch" data-text="BOOTCAMP">BOOTCAMP</span>
             <span class="title-yellow">DIGITAL FACTORY</span>
             <span class="title-year">2026</span>
           </h1>
@@ -70,32 +93,22 @@
               <i class="fa-solid fa-arrow-right"></i>
             </a>
           </div>
+
+          <!-- Chips flotantes con tecnologías -->
+          <div class="hero-floating-chips">
+            <span class="floating-chip"><i class="fa-solid fa-brain"></i> IA</span>
+            <span class="floating-chip"><i class="fa-solid fa-gears"></i> Automatización</span>
+            <span class="floating-chip"><i class="fa-solid fa-microchip"></i> IoT</span>
+            <span class="floating-chip"><i class="fa-solid fa-robot"></i> Robótica</span>
+            <span class="floating-chip"><i class="fa-solid fa-chart-line"></i> Productividad</span>
+          </div>
         </div>
 
-        <!-- 2. Contenedor de Video (Ocupa todo el espacio restante con esquinas redondeadas y borde brillante) -->
-        <div class="hero-video-wrapper">
-          <div class="hero-video-frame">
-            <video 
-              id="bootcampVideo"
-              autoplay 
-              muted 
-              loop 
-              playsinline 
-              poster="source/informacion.png"
-              title="Actividades del Bootcamp Digital Factory SENA 2026"
-            >
-              <source src="source/video_actividades.mp4" type="video/mp4">
-              <source src="video_actividades.mp4" type="video/mp4">
-              Tu navegador no soporta el elemento de video.
-            </video>
-
-            <!-- Solo control de audio accesible (SIN ningún mensaje de texto como fue solicitado) -->
-            <div class="video-audio-corner">
-              <button id="toggleAudioBtn" class="btn-audio-toggle" type="button" aria-label="Alternar audio del video">
-                <i class="fa-solid fa-volume-xmark" id="audioIcon"></i>
-                <span id="audioText">Activar Audio</span>
-              </button>
-            </div>
+        <!-- 2. Carrusel de Imágenes Dinámico (rotación automática) -->
+        <canvas id="particles-canvas" aria-hidden="true"></canvas>
+        <div class="hero-carousel" id="heroCarousel" aria-roledescription="carrusel" aria-label="Imágenes de actividades del Bootcamp">
+          <div class="hero-carousel-track" aria-live="off">
+            <!-- Slides generados dinámicamente desde interactive.js -->
           </div>
         </div>
 
@@ -103,7 +116,7 @@
     </div>
   </header>
 
-  <!-- Menú Rodante Continuo (Ticker) entre el Video y la Información -->
+  <!-- Menú Rodante Continuo (Ticker) entre el Banner y la Información -->
   <section class="rolling-ticker-section" aria-label="Menú rodante de temáticas institucionales">
     <div class="rolling-ticker-track">
       <!-- Grupo 1 -->
@@ -162,15 +175,22 @@
     </div>
   </section>
 
+  <!-- Divisor de ola estilo Caribe (transición ticker -> información) -->
+  <div class="wave-divider wave-divider--sea" aria-hidden="true">
+    <svg viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path fill="currentColor" d="M0,32 C240,64 480,0 720,16 C960,32 1200,64 1440,32 L1440,60 L0,60 Z"></path>
+    </svg>
+  </div>
+
   <!-- ==========================================================================
        SECCIÓN 2: INFORMACIÓN DEL EVENTO
        ========================================================================== -->
   <main>
-    <section class="section-info" id="informacion">
+    <section class="section-info" id="informacion" data-reveal>
       <div class="container">
         
         <!-- Lema Oficial Centrado -->
-        <div class="slogan-card">
+        <div class="slogan-card reveal">
           <h2 class="slogan-title">
             ¿Tienes un reto en tu proceso productivo?
           </h2>
@@ -182,11 +202,31 @@
           </div>
         </div>
 
+        <!-- Franja de estadísticas clave, estilo CaribeConf -->
+        <div class="stats-strip reveal reveal-scale reveal-delay-1">
+          <div class="stat-item">
+            <span class="stat-number">2</span>
+            <span class="stat-label">Días de inmersión</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">48h</span>
+            <span class="stat-label">Reto continuo</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">5</span>
+            <span class="stat-label">Pilares tecnológicos</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">8-6</span>
+            <span class="stat-label">Jornada continua (a.m. - p.m.)</span>
+          </div>
+        </div>
+
         <!-- Cuadrícula con la Información Clave (Fecha, Horario, Ubicación) -->
-        <div class="info-grid">
+        <div class="info-grid"><!-- cards get individual reveals via JS -->
           
           <!-- Tarjeta Fecha -->
-          <article class="info-card">
+          <article class="info-card tilt-card reveal reveal-left reveal-delay-1">
             <div>
               <div class="card-header">
                 <div class="card-icon-wrap">
@@ -207,7 +247,7 @@
           </article>
 
           <!-- Tarjeta Horario -->
-          <article class="info-card">
+          <article class="info-card tilt-card reveal reveal-scale reveal-delay-2">
             <div>
               <div class="card-header">
                 <div class="card-icon-wrap">
@@ -228,7 +268,7 @@
           </article>
 
           <!-- Tarjeta Ubicación -->
-          <article class="info-card">
+          <article class="info-card tilt-card reveal reveal-right reveal-delay-3">
             <div>
               <div class="card-header">
                 <div class="card-icon-wrap">
@@ -251,7 +291,7 @@
         </div>
 
         <!-- Contador Regresivo Interactivo -->
-        <div class="countdown-container">
+        <div class="countdown-container reveal reveal-delay-2">
           <div class="countdown-title">
             <i class="fa-solid fa-stopwatch highlight-neon"></i>
             <span>Cuenta regresiva para el lanzamiento oficial:</span>
@@ -288,13 +328,20 @@
       </div>
     </section>
 
+    <!-- Divisor de ola (transición información -> registro) -->
+    <div class="wave-divider wave-divider--purple" aria-hidden="true">
+      <svg viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path fill="currentColor" d="M0,20 C240,50 480,0 720,24 C960,48 1200,10 1440,30 L1440,60 L0,60 Z"></path>
+      </svg>
+    </div>
+
     <!-- ==========================================================================
          SECCIÓN 3: FORMULARIO DINÁMICO CON JAVASCRIPT
          ========================================================================== -->
-    <section class="section-registration" id="registro">
+    <section class="section-registration" id="registro" data-reveal>
       <div class="container">
         
-        <div class="form-wrapper">
+        <div class="form-wrapper reveal reveal-scale">
           <div class="form-header">
             <div class="badge-pill" style="margin-bottom: 12px;">
               <i class="fa-solid fa-user-plus"></i> Cupos Limitados
@@ -307,11 +354,11 @@
 
           <form id="bootcampForm" novalidate>
             
-            <!-- Selector de Rol (Tabs Visuales y <select> sincronizados) -->
+            <!-- Selector de Rol (Tabs Visuales) -->
             <div class="role-selection-group">
-              <label for="roleSelector" class="role-label-title">
+              <span class="role-label-title">
                 <i class="fa-solid fa-id-badge"></i> Selecciona tu Rol de Participación
-              </label>
+              </span>
 
               <div class="role-options-grid" role="radiogroup" aria-label="Seleccionar rol">
                 <label class="role-card-option">
@@ -329,13 +376,6 @@
                     <span>Invitado / Empresa</span>
                   </div>
                 </label>
-              </div>
-
-              <div class="select-dropdown-container">
-                <select id="roleSelector" name="role" class="custom-select" aria-label="Selector de Rol de participante">
-                  <option value="Aprendiz" selected>Rol: Aprendiz</option>
-                  <option value="Invitado">Rol: Invitado</option>
-                </select>
               </div>
             </div>
 
@@ -383,10 +423,30 @@
                   <span class="input-error-msg">Por favor escribe tu nombre completo.</span>
                 </div>
 
+                <!-- Tipo de Documento -->
+                <div class="input-group" id="grpTipoDocAprendiz">
+                  <label for="tipoDocAprendiz">
+                    <span>Tipo de Documento</span> <span class="req">*</span>
+                  </label>
+                  <div class="input-wrapper">
+                    <i class="fa-solid fa-id-badge"></i>
+                    <select id="tipoDocAprendiz" name="tipoDocAprendiz" class="form-control" required>
+                      <option value="" disabled selected>Selecciona un tipo</option>
+                      <option value="CC">Cédula de Ciudadanía (CC)</option>
+                      <option value="TI">Tarjeta de Identidad (TI)</option>
+                      <option value="CE">Cédula de Extranjería (CE)</option>
+                      <option value="PPT">Permiso por Protección Temporal (PPT)</option>
+                      <option value="PA">Pasaporte</option>
+                      <option value="Otro">Otro</option>
+                    </select>
+                  </div>
+                  <span class="input-error-msg">Selecciona tu tipo de documento.</span>
+                </div>
+
                 <!-- Cédula -->
                 <div class="input-group" id="grpCedulaAprendiz">
                   <label for="cedulaAprendiz">
-                    <span>Cédula o Documento de Identidad</span> <span class="req">*</span>
+                    <span>Número de Documento</span> <span class="req">*</span>
                   </label>
                   <div class="input-wrapper">
                     <i class="fa-solid fa-address-card"></i>
@@ -401,6 +461,25 @@
                     >
                   </div>
                   <span class="input-error-msg">Ingresa un número de documento válido.</span>
+                </div>
+
+                <!-- Correo Electrónico -->
+                <div class="input-group" id="grpCorreoAprendiz">
+                  <label for="correoAprendiz">
+                    <span>Correo Electrónico</span> <span class="req">*</span>
+                  </label>
+                  <div class="input-wrapper">
+                    <i class="fa-solid fa-envelope"></i>
+                    <input
+                      type="email"
+                      id="correoAprendiz"
+                      name="correoAprendiz"
+                      class="form-control"
+                      placeholder="Ej: nombre@correo.com"
+                      required
+                    >
+                  </div>
+                  <span class="input-error-msg">Ingresa un correo electrónico válido: aquí llegará tu confirmación y tu código QR de acceso.</span>
                 </div>
 
                 <!-- Centro al que pertenece -->
@@ -427,10 +506,10 @@
               <!-- GRUPO INVITADO (Oculto inicialmente) -->
               <div id="fieldsInvitado" class="dynamic-fieldset" style="display: none;">
                 
-                <!-- Empresa -->
+                <!-- Empresa (opcional) -->
                 <div class="input-group" id="grpEmpresa">
                   <label for="empresaInvitado">
-                    <span>Empresa o Entidad</span> <span class="req">*</span>
+                    <span>Empresa o Entidad</span> <span class="opcional">(opcional)</span>
                   </label>
                   <div class="input-wrapper">
                     <i class="fa-solid fa-building"></i>
@@ -463,10 +542,29 @@
                   <span class="input-error-msg">Por favor escribe tu nombre completo.</span>
                 </div>
 
+                <!-- Tipo de Documento -->
+                <div class="input-group" id="grpTipoDocInvitado">
+                  <label for="tipoDocInvitado">
+                    <span>Tipo de Documento</span> <span class="req">*</span>
+                  </label>
+                  <div class="input-wrapper">
+                    <i class="fa-solid fa-id-badge"></i>
+                    <select id="tipoDocInvitado" name="tipoDocInvitado" class="form-control">
+                      <option value="" disabled selected>Selecciona un tipo</option>
+                      <option value="CC">Cédula de Ciudadanía (CC)</option>
+                      <option value="CE">Cédula de Extranjería (CE)</option>
+                      <option value="PPT">Permiso por Protección Temporal (PPT)</option>
+                      <option value="PA">Pasaporte</option>
+                      <option value="Otro">Otro</option>
+                    </select>
+                  </div>
+                  <span class="input-error-msg">Selecciona tu tipo de documento.</span>
+                </div>
+
                 <!-- Número de Cédula -->
                 <div class="input-group" id="grpCedulaInvitado">
                   <label for="cedulaInvitado">
-                    <span>Número de Cédula</span> <span class="req">*</span>
+                    <span>Número de Documento</span> <span class="req">*</span>
                   </label>
                   <div class="input-wrapper">
                     <i class="fa-solid fa-id-card"></i>
@@ -479,17 +577,47 @@
                       inputmode="numeric"
                     >
                   </div>
-                  <span class="input-error-msg">Ingresa un número de cédula válido.</span>
+                  <span class="input-error-msg">Ingresa un número de documento válido.</span>
+                </div>
+
+                <!-- Correo Electrónico -->
+                <div class="input-group" id="grpCorreoInvitado">
+                  <label for="correoInvitado">
+                    <span>Correo Electrónico</span> <span class="req">*</span>
+                  </label>
+                  <div class="input-wrapper">
+                    <i class="fa-solid fa-envelope"></i>
+                    <input
+                      type="email"
+                      id="correoInvitado"
+                      name="correoInvitado"
+                      class="form-control"
+                      placeholder="Ej: nombre@correo.com"
+                    >
+                  </div>
+                  <span class="input-error-msg">Ingresa un correo electrónico válido: aquí llegará tu confirmación y tu código QR de acceso.</span>
                 </div>
 
               </div>
 
             </div>
 
+            <!-- Aviso sobre confirmación por correo + QR -->
+            <div class="form-hint">
+              <i class="fa-solid fa-qrcode"></i>
+              <span>Al enviar tu registro recibirás un correo de confirmación con tu <strong>código QR de acceso</strong> al evento. Revisa también la carpeta de spam/no deseados.</span>
+            </div>
+
+            <!-- Mensaje de error de envío (se activa desde script.js) -->
+            <div class="form-alert" id="formAlert">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+              <span id="formAlertText">No pudimos enviar tu registro. Inténtalo de nuevo en unos segundos.</span>
+            </div>
+
             <!-- Botón de Envío -->
             <button type="submit" class="btn-submit-registration" id="btnSubmit">
-              <span>Enviar Registro</span>
-              <i class="fa-solid fa-arrow-right"></i>
+              <span id="btnSubmitText">Enviar Registro</span>
+              <i class="fa-solid fa-arrow-right" id="btnSubmitIcon"></i>
             </button>
 
           </form>
@@ -511,6 +639,11 @@
         Tu solicitud de participación en el <strong>BOOTCAMP DIGITAL FACTORY 2026</strong> ha sido recibida y confirmada satisfactoriamente.
       </p>
 
+      <div class="modal-qr-note">
+        <i class="fa-solid fa-envelope-circle-check"></i>
+        <span>Enviamos un correo de confirmación con tu <strong>código QR de acceso</strong> al evento. Si no lo ves en unos minutos, revisa la carpeta de spam.</span>
+      </div>
+
       <div class="modal-details-summary" id="modalSummaryContent">
         <!-- Resumen dinámico JS -->
       </div>
@@ -519,6 +652,13 @@
         Aceptar y Finalizar
       </button>
     </div>
+  </div>
+
+  <!-- Divisor de ola estilo Caribe (transición registro -> footer) -->
+  <div class="wave-divider wave-divider--sea" aria-hidden="true">
+    <svg viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path fill="currentColor" d="M0,30 C220,0 460,58 720,30 C980,2 1220,50 1440,24 L1440,60 L0,60 Z"></path>
+    </svg>
   </div>
 
   <!-- ==========================================================================
@@ -601,7 +741,13 @@
     </div>
   </footer>
 
+  <!-- Botón Volver Arriba -->
+  <button class="btn-back-top" id="btnBackTop" aria-label="Volver al inicio">
+    <i class="fa-solid fa-arrow-up"></i>
+  </button>
+
   <!-- Lógica y Funcionalidad JavaScript Externa -->
   <script src="scripts/script.js"></script>
+  <script src="scripts/interactive.js"></script>
 </body>
 </html>

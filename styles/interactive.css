@@ -1,0 +1,398 @@
+/* ==========================================================================
+   INTERACTIVE.CSS — Mejoras interactivas inspiradas en CaribeConf
+   Mantiene el sistema de colores original (--neon-yellow, --purple-accent, etc.)
+   ========================================================================== */
+
+/* ──────────────────────────────────────────────────────────
+   1. CURSOR PERSONALIZADO NEON
+────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  cursor: none !important;
+}
+input, select, textarea {
+  cursor: text !important;
+}
+a, button, label, [role="button"] {
+  cursor: none !important;
+}
+
+.cursor-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--neon-yellow);
+  border-radius: 50%;
+  position: fixed;
+  top: 0; left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: width 0.2s, height 0.2s, background 0.2s, opacity 0.2s;
+  box-shadow: 0 0 12px var(--neon-yellow), 0 0 24px rgba(232,253,54,0.5);
+}
+
+.cursor-ring {
+  width: 36px;
+  height: 36px;
+  border: 2px solid rgba(232,253,54,0.6);
+  border-radius: 50%;
+  position: fixed;
+  top: 0; left: 0;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: width 0.35s cubic-bezier(0.25, 0.8, 0.25, 1),
+              height 0.35s cubic-bezier(0.25, 0.8, 0.25, 1),
+              border-color 0.3s;
+}
+
+.cursor-dot.cursor-hover {
+  width: 14px;
+  height: 14px;
+  background: var(--turquoise);
+  box-shadow: 0 0 18px var(--turquoise);
+}
+
+.cursor-ring.cursor-hover {
+  width: 58px;
+  height: 58px;
+  border-color: var(--turquoise);
+}
+
+/* ──────────────────────────────────────────────────────────
+   2. NAVBAR STICKY + HAMBURGER MOVIL
+────────────────────────────────────────────────────────── */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  transition: background 0.4s ease, box-shadow 0.4s ease, padding 0.3s ease;
+  padding: 12px 0;
+}
+
+.navbar.scrolled {
+  background: rgba(7, 0, 18, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(232,253,54,0.08);
+  padding: 8px 0;
+}
+
+.nav-hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: 1px solid var(--border-glass);
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: none;
+  z-index: 201;
+  transition: all 0.3s ease;
+}
+
+.nav-hamburger span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--neon-yellow);
+  border-radius: 2px;
+  transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.nav-hamburger.active span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.nav-hamburger.active span:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+.nav-hamburger.active span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+@media (max-width: 768px) {
+  .nav-hamburger {
+    display: flex;
+  }
+  .nav-links {
+    position: fixed !important;
+    top: 0;
+    right: -100%;
+    width: min(280px, 80vw);
+    height: 100vh;
+    background: rgba(10, 0, 26, 0.98);
+    backdrop-filter: blur(20px);
+    border-left: 1px solid var(--border-glass);
+    flex-direction: column !important;
+    justify-content: center;
+    align-items: flex-start !important;
+    gap: 0 !important;
+    padding: 40px 32px;
+    transition: right 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    z-index: 200;
+    display: flex !important;
+  }
+  .nav-links.open {
+    right: 0;
+    box-shadow: -20px 0 60px rgba(0,0,0,0.7);
+  }
+  .nav-links li {
+    width: 100%;
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 16px 0;
+  }
+  .nav-links a {
+    font-size: 1.1rem !important;
+  }
+  .nav-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 199;
+    backdrop-filter: blur(4px);
+  }
+  .nav-overlay.active {
+    display: block;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   3. SCROLL REVEAL
+────────────────────────────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.7s cubic-bezier(0.25, 0.8, 0.25, 1),
+              transform 0.7s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.reveal.reveal-left { transform: translateX(-50px); }
+.reveal.reveal-right { transform: translateX(50px); }
+.reveal.reveal-scale { transform: scale(0.85); }
+.reveal.visible { opacity: 1; transform: none; }
+
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+.reveal-delay-5 { transition-delay: 0.5s; }
+
+/* ──────────────────────────────────────────────────────────
+   4. CANVAS PARTICULAS HERO
+────────────────────────────────────────────────────────── */
+#particles-canvas {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  border-radius: inherit;
+}
+
+/* ──────────────────────────────────────────────────────────
+   5. STATS ANIMADOS
+────────────────────────────────────────────────────────── */
+.stat-item {
+  position: relative;
+  overflow: hidden;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+.stat-item:hover {
+  background: rgba(232, 253, 54, 0.06);
+  transform: translateY(-4px);
+}
+.stat-item::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  background: var(--neon-yellow);
+  box-shadow: 0 0 10px var(--neon-yellow);
+  transition: width 0.5s ease;
+}
+.stat-item:hover::after { width: 60%; }
+
+/* ──────────────────────────────────────────────────────────
+   6. 3D TILT CARDS
+────────────────────────────────────────────────────────── */
+.tilt-card { transform-style: preserve-3d; will-change: transform; }
+.tilt-card .card-icon-wrap { transform: translateZ(20px); transition: transform 0.15s ease; }
+
+/* ──────────────────────────────────────────────────────────
+   7. COUNTDOWN FLIP
+────────────────────────────────────────────────────────── */
+.c-box {
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+}
+.c-box:hover {
+  border-color: var(--neon-yellow);
+  box-shadow: 0 0 20px rgba(232,253,54,0.25);
+  transform: translateY(-4px) scale(1.05);
+}
+.c-number.flip {
+  animation: flipNum 0.4s ease forwards;
+}
+@keyframes flipNum {
+  0%   { transform: rotateX(0deg);    opacity: 1; }
+  50%  { transform: rotateX(-90deg);  opacity: 0; }
+  51%  { transform: rotateX(90deg);   opacity: 0; }
+  100% { transform: rotateX(0deg);    opacity: 1; }
+}
+
+/* ──────────────────────────────────────────────────────────
+   8. FLOATING CHIPS HERO
+────────────────────────────────────────────────────────── */
+.hero-floating-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+.floating-chip {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  animation: chipFloat 3s ease-in-out infinite;
+  transition: border-color 0.3s, color 0.3s;
+}
+.floating-chip:nth-child(2) { animation-delay: 0.5s; }
+.floating-chip:nth-child(3) { animation-delay: 1s; }
+.floating-chip:nth-child(4) { animation-delay: 1.5s; }
+.floating-chip:nth-child(5) { animation-delay: 2s; }
+.floating-chip i { color: var(--neon-yellow); font-size: 0.65rem; }
+.floating-chip:hover { border-color: var(--neon-yellow); color: #fff; }
+@keyframes chipFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* ──────────────────────────────────────────────────────────
+   9. PILLAR TAGS HOVER FILL
+────────────────────────────────────────────────────────── */
+.pillar-tag { cursor: none; position: relative; overflow: hidden; }
+.pillar-tag::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--neon-yellow);
+  transform: translateX(-100%);
+  transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+  z-index: 0;
+  border-radius: inherit;
+}
+.pillar-tag:hover::before { transform: translateX(0); }
+.pillar-tag:hover { color: #070012; border-color: var(--neon-yellow); }
+.pillar-tag:hover i { color: #070012; }
+.pillar-tag span, .pillar-tag i { position: relative; z-index: 1; transition: color 0.35s; }
+
+/* ──────────────────────────────────────────────────────────
+   10. MODAL MEJORADO
+────────────────────────────────────────────────────────── */
+.modal-overlay.active .modal-card {
+  animation: modalPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+@keyframes modalPop {
+  0%   { transform: scale(0.7) translateY(40px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+.modal-icon-badge {
+  animation: iconSpin 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both;
+}
+@keyframes iconSpin {
+  0%   { transform: scale(0) rotate(-180deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+/* ──────────────────────────────────────────────────────────
+   11. SCROLL PROGRESS BAR
+────────────────────────────────────────────────────────── */
+.scroll-progress {
+  position: fixed;
+  top: 0; left: 0;
+  width: 0%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--neon-yellow), var(--turquoise));
+  box-shadow: 0 0 10px var(--neon-yellow);
+  z-index: 9999;
+  transition: width 0.1s linear;
+}
+
+/* ──────────────────────────────────────────────────────────
+   12. BOTON VOLVER ARRIBA
+────────────────────────────────────────────────────────── */
+.btn-back-top {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--neon-yellow);
+  color: #070012;
+  border: none;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: none;
+  z-index: 300;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 4px 20px rgba(232,253,54,0.4);
+}
+.btn-back-top.visible { opacity: 1; visibility: visible; transform: translateY(0); }
+.btn-back-top:hover {
+  background: #fff;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(255,255,255,0.3);
+}
+
+/* ──────────────────────────────────────────────────────────
+   13. TICKER FADE EDGES
+────────────────────────────────────────────────────────── */
+.rolling-ticker-section { position: relative; }
+.rolling-ticker-section::before,
+.rolling-ticker-section::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 80px;
+  z-index: 2;
+  pointer-events: none;
+}
+.rolling-ticker-section::before {
+  left: 0;
+  background: linear-gradient(to right, var(--bg-deep), transparent);
+}
+.rolling-ticker-section::after {
+  right: 0;
+  background: linear-gradient(to left, var(--bg-deep), transparent);
+}
+
+/* ──────────────────────────────────────────────────────────
+   14. ACCESIBILIDAD
+────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .floating-chip,
+  .c-number.flip {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+  .cursor-dot, .cursor-ring { display: none !important; }
+  *, *::before, *::after { cursor: auto !important; }
+}
