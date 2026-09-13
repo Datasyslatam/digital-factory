@@ -1,6 +1,6 @@
 /* ==========================================================================
    INTERACTIVE.JS — Bootcamp Digital Factory 2026
-Funcionalidades: Cursor custom, Scroll reveal, Partículas, Stats animados,
+Funcionalidades: Scroll reveal, Partículas, Stats animados,
     Tilt 3D, Flip countdown, Hero carousel, Hamburger nav, Back-to-top, Progress
    ========================================================================== */
 
@@ -13,60 +13,7 @@ Funcionalidades: Cursor custom, Scroll reveal, Partículas, Stats animados,
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // ══════════════════════════════════════════════════
-  //  1. CURSOR PERSONALIZADO NEON
-  // ══════════════════════════════════════════════════
-  if (!reducedMotion) {
-    const dot  = document.getElementById('cursorDot');
-    const ring = document.getElementById('cursorRing');
-
-    if (dot && ring) {
-      let mouseX = 0, mouseY = 0;
-      let ringX  = 0, ringY  = 0;
-      let animId;
-
-      document.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-        dot.style.left = mouseX + 'px';
-        dot.style.top  = mouseY + 'px';
-      });
-
-      function animateRing() {
-        ringX += (mouseX - ringX) * 0.12;
-        ringY += (mouseY - ringY) * 0.12;
-        ring.style.left = ringX + 'px';
-        ring.style.top  = ringY + 'px';
-        animId = requestAnimationFrame(animateRing);
-      }
-      animateRing();
-
-      // Hover en interactivos
-      const hoverTargets = 'a, button, label, [role="button"], .pillar-tag, .info-card, .hero-slide';
-      document.querySelectorAll(hoverTargets).forEach(el => {
-        el.addEventListener('mouseenter', () => {
-          dot.classList.add('cursor-hover');
-          ring.classList.add('cursor-hover');
-        });
-        el.addEventListener('mouseleave', () => {
-          dot.classList.remove('cursor-hover');
-          ring.classList.remove('cursor-hover');
-        });
-      });
-
-      // Ocultar cursor cuando sale de la ventana
-      document.addEventListener('mouseleave', () => {
-        dot.style.opacity  = '0';
-        ring.style.opacity = '0';
-      });
-      document.addEventListener('mouseenter', () => {
-        dot.style.opacity  = '1';
-        ring.style.opacity = '1';
-      });
-    }
-  }
-
-  // ══════════════════════════════════════════════════
-  //  2. NAVBAR STICKY — Clases al hacer scroll
+  //  1. NAVBAR STICKY — Clases al hacer scroll
   // ══════════════════════════════════════════════════
   const navbar = document.querySelector('.navbar');
   if (navbar) {
@@ -448,8 +395,7 @@ Funcionalidades: Cursor custom, Scroll reveal, Partículas, Stats animados,
   }
 
   // ══════════════════════════════════════════════════
-  //  12. PILLAR TAGS — Cursor hover dinámico
-  //      (complementa CSS, para el cursor custom)
+  //  12. PILLAR TAGS — Hover dinámico
   // ══════════════════════════════════════════════════
   const pillarTags = document.querySelectorAll('.pillar-tag');
   pillarTags.forEach(tag => {
@@ -503,27 +449,6 @@ Funcionalidades: Cursor custom, Scroll reveal, Partículas, Stats animados,
     }, { threshold: 0.35 });
 
     sections.forEach(s => sectionObserver.observe(s));
-  }
-
-  // ══════════════════════════════════════════════════
-  //  15. HOVER RE-ATTACH para cursor custom en elementos
-  //      dinámicos (agenda tabs que se crean después)
-  // ══════════════════════════════════════════════════
-  if (!reducedMotion) {
-    const dot  = document.getElementById('cursorDot');
-    const ring = document.getElementById('cursorRing');
-    if (dot && ring) {
-      document.querySelectorAll('.btn-back-top, .btn-action-primary, .btn-action-secondary, .btn-submit-registration, .btn-modal-close').forEach(el => {
-        el.addEventListener('mouseenter', () => {
-          dot.classList.add('cursor-hover');
-          ring.classList.add('cursor-hover');
-        });
-        el.addEventListener('mouseleave', () => {
-          dot.classList.remove('cursor-hover');
-          ring.classList.remove('cursor-hover');
-        });
-      });
-    }
   }
 
 })();

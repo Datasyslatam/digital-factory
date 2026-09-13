@@ -4,62 +4,7 @@
    ========================================================================== */
 
 /* ──────────────────────────────────────────────────────────
-   1. CURSOR PERSONALIZADO NEON
-────────────────────────────────────────────────────────── */
-*, *::before, *::after {
-  cursor: none !important;
-}
-input, select, textarea {
-  cursor: text !important;
-}
-a, button, label, [role="button"] {
-  cursor: none !important;
-}
-
-.cursor-dot {
-  width: 8px;
-  height: 8px;
-  background: var(--neon-yellow);
-  border-radius: 50%;
-  position: fixed;
-  top: 0; left: 0;
-  pointer-events: none;
-  z-index: 9999;
-  transform: translate(-50%, -50%);
-  transition: width 0.2s, height 0.2s, background 0.2s, opacity 0.2s;
-  box-shadow: 0 0 12px var(--neon-yellow), 0 0 24px rgba(232,253,54,0.5);
-}
-
-.cursor-ring {
-  width: 36px;
-  height: 36px;
-  border: 2px solid rgba(232,253,54,0.6);
-  border-radius: 50%;
-  position: fixed;
-  top: 0; left: 0;
-  pointer-events: none;
-  z-index: 9998;
-  transform: translate(-50%, -50%);
-  transition: width 0.35s cubic-bezier(0.25, 0.8, 0.25, 1),
-              height 0.35s cubic-bezier(0.25, 0.8, 0.25, 1),
-              border-color 0.3s;
-}
-
-.cursor-dot.cursor-hover {
-  width: 14px;
-  height: 14px;
-  background: var(--turquoise);
-  box-shadow: 0 0 18px var(--turquoise);
-}
-
-.cursor-ring.cursor-hover {
-  width: 58px;
-  height: 58px;
-  border-color: var(--turquoise);
-}
-
-/* ──────────────────────────────────────────────────────────
-   2. NAVBAR STICKY + HAMBURGER MOVIL
+   1. NAVBAR STICKY + HAMBURGER MOVIL
 ────────────────────────────────────────────────────────── */
 .navbar {
   position: sticky;
@@ -84,7 +29,6 @@ a, button, label, [role="button"] {
   border: 1px solid var(--border-glass);
   border-radius: 8px;
   padding: 8px 10px;
-  cursor: none;
   z-index: 201;
   transition: all 0.3s ease;
 }
@@ -157,7 +101,7 @@ a, button, label, [role="button"] {
 }
 
 /* ──────────────────────────────────────────────────────────
-   3. SCROLL REVEAL
+   2. SCROLL REVEAL
 ────────────────────────────────────────────────────────── */
 .reveal {
   opacity: 0;
@@ -177,7 +121,7 @@ a, button, label, [role="button"] {
 .reveal-delay-5 { transition-delay: 0.5s; }
 
 /* ──────────────────────────────────────────────────────────
-   4. CANVAS PARTICULAS HERO
+   3. CANVAS PARTICULAS HERO
 ────────────────────────────────────────────────────────── */
 #particles-canvas {
   position: absolute;
@@ -188,7 +132,7 @@ a, button, label, [role="button"] {
 }
 
 /* ──────────────────────────────────────────────────────────
-   5. STATS ANIMADOS
+   4. STATS ANIMADOS
 ────────────────────────────────────────────────────────── */
 .stat-item {
   position: relative;
@@ -214,13 +158,13 @@ a, button, label, [role="button"] {
 .stat-item:hover::after { width: 60%; }
 
 /* ──────────────────────────────────────────────────────────
-   6. 3D TILT CARDS
+   5. 3D TILT CARDS
 ────────────────────────────────────────────────────────── */
 .tilt-card { transform-style: preserve-3d; will-change: transform; }
 .tilt-card .card-icon-wrap { transform: translateZ(20px); transition: transform 0.15s ease; }
 
 /* ──────────────────────────────────────────────────────────
-   7. COUNTDOWN FLIP
+   6. COUNTDOWN FLIP
 ────────────────────────────────────────────────────────── */
 .c-box {
   position: relative;
@@ -243,7 +187,7 @@ a, button, label, [role="button"] {
 }
 
 /* ──────────────────────────────────────────────────────────
-   8. FLOATING CHIPS HERO
+   7. FLOATING CHIPS HERO
 ────────────────────────────────────────────────────────── */
 .hero-floating-chips {
   display: flex;
@@ -278,9 +222,9 @@ a, button, label, [role="button"] {
 }
 
 /* ──────────────────────────────────────────────────────────
-   9. PILLAR TAGS HOVER FILL
+   8. PILLAR TAGS HOVER FILL
 ────────────────────────────────────────────────────────── */
-.pillar-tag { cursor: none; position: relative; overflow: hidden; }
+.pillar-tag { position: relative; overflow: hidden; }
 .pillar-tag::before {
   content: '';
   position: absolute;
@@ -297,7 +241,7 @@ a, button, label, [role="button"] {
 .pillar-tag span, .pillar-tag i { position: relative; z-index: 1; transition: color 0.35s; }
 
 /* ──────────────────────────────────────────────────────────
-   10. MODAL MEJORADO
+   9. MODAL MEJORADO
 ────────────────────────────────────────────────────────── */
 .modal-overlay.active .modal-card {
   animation: modalPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
@@ -315,7 +259,7 @@ a, button, label, [role="button"] {
 }
 
 /* ──────────────────────────────────────────────────────────
-   11. SCROLL PROGRESS BAR
+   10. SCROLL PROGRESS BAR
 ────────────────────────────────────────────────────────── */
 .scroll-progress {
   position: fixed;
@@ -329,7 +273,7 @@ a, button, label, [role="button"] {
 }
 
 /* ──────────────────────────────────────────────────────────
-   12. BOTON VOLVER ARRIBA
+   11. BOTON VOLVER ARRIBA
 ────────────────────────────────────────────────────────── */
 .btn-back-top {
   position: fixed;
@@ -345,7 +289,6 @@ a, button, label, [role="button"] {
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: none;
   z-index: 300;
   opacity: 0;
   visibility: hidden;
@@ -361,7 +304,7 @@ a, button, label, [role="button"] {
 }
 
 /* ──────────────────────────────────────────────────────────
-   13. TICKER FADE EDGES
+   12. TICKER FADE EDGES
 ────────────────────────────────────────────────────────── */
 .rolling-ticker-section { position: relative; }
 .rolling-ticker-section::before,
@@ -383,7 +326,7 @@ a, button, label, [role="button"] {
 }
 
 /* ──────────────────────────────────────────────────────────
-   14. ACCESIBILIDAD
+   13. ACCESIBILIDAD
 ────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .reveal, .floating-chip,
@@ -393,6 +336,4 @@ a, button, label, [role="button"] {
     transform: none !important;
     opacity: 1 !important;
   }
-  .cursor-dot, .cursor-ring { display: none !important; }
-  *, *::before, *::after { cursor: auto !important; }
 }
