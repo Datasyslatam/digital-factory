@@ -13,7 +13,7 @@
  * ============================================================================
  */
 
-const SHEET_ID = 'PEGA_AQUI_EL_ID_DE_TU_GOOGLE_SHEET';
+const SHEET_ID = 'https://docs.google.com/spreadsheets/d/1TUfzV8lSomRgISSeBR_pQ0eTs3TnnRI4lcgP1o-r6qU/edit?usp=sharing';
 const SHEET_APRENDICES = 'Aprendices';
 const SHEET_INVITADOS = 'Invitados';
 
