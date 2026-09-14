@@ -1,15 +1,17 @@
 /* ==========================================================================
-   CONFIGURACIÓN DEL BACKEND (Google Apps Script + Google Sheets)
-   --------------------------------------------------------------------------
-   1. Sigue las instrucciones de INSTRUCCIONES.md para crear la Google Sheet
-      y desplegar el Apps Script (google-apps-script/Code.gs) como aplicación
-      web.
-   2. Pega aquí la URL que te entrega el despliegue (termina en /exec).
+   SCRIPT.JS — Lógica del Formulario Dinámico, Backend Google Sheets & Seguridad
+   Bootcamp Digital Factory & IA 2026 (SENA Regional Atlántico)
    ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. CONFIGURACIÓN DEL BACKEND (Google Apps Script + Google Sheets)
+   -------------------------------------------------------------------------- */
 const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwW391OHJwEmWZGkapvqa8HQ24AW6c6XGDEBWV6NUpi2PdlvCIWh7UR2cxu9CAolEXu/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
-  // 1. Manejo dinámico de roles
+  /* ------------------------------------------------------------------------
+     2. MANEJO DINÁMICO DE ROLES EN EL FORMULARIO
+     ------------------------------------------------------------------------ */
   const radioAprendiz = document.getElementById('radioAprendiz');
   const radioInvitado = document.getElementById('radioInvitado');
   
@@ -45,11 +47,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function setRole(role) {
     if (role === 'Aprendiz') {
-      if (fieldsAprendiz) fieldsAprendiz.style.display = 'flex';
+      if (fieldsAprendiz) fieldsAprendiz.style.display = 'grid';
       if (fieldsInvitado) fieldsInvitado.style.display = 'none';
 
       if (radioAprendiz) radioAprendiz.checked = true;
 
+      // Requeridos para Aprendiz
       if (numFicha) numFicha.setAttribute('required', 'true');
       if (nombreAprendiz) nombreAprendiz.setAttribute('required', 'true');
       if (tipoDocAprendiz) tipoDocAprendiz.setAttribute('required', 'true');
@@ -57,6 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (correoAprendiz) correoAprendiz.setAttribute('required', 'true');
       if (centroPertenencia) centroPertenencia.setAttribute('required', 'true');
 
+      // No requeridos para Invitado
       if (empresaInvitado) empresaInvitado.removeAttribute('required');
       if (nombreInvitado) nombreInvitado.removeAttribute('required');
       if (tipoDocInvitado) tipoDocInvitado.removeAttribute('required');
@@ -66,15 +70,17 @@ document.addEventListener('DOMContentLoaded', () => {
       if (fieldsInvitado) clearErrors(fieldsInvitado);
     } else {
       if (fieldsAprendiz) fieldsAprendiz.style.display = 'none';
-      if (fieldsInvitado) fieldsInvitado.style.display = 'flex';
+      if (fieldsInvitado) fieldsInvitado.style.display = 'grid';
 
       if (radioInvitado) radioInvitado.checked = true;
 
+      // Requeridos para Invitado
       if (nombreInvitado) nombreInvitado.setAttribute('required', 'true');
       if (tipoDocInvitado) tipoDocInvitado.setAttribute('required', 'true');
       if (cedulaInvitado) cedulaInvitado.setAttribute('required', 'true');
       if (correoInvitado) correoInvitado.setAttribute('required', 'true');
 
+      // No requeridos para Aprendiz
       if (numFicha) numFicha.removeAttribute('required');
       if (nombreAprendiz) nombreAprendiz.removeAttribute('required');
       if (tipoDocAprendiz) tipoDocAprendiz.removeAttribute('required');
@@ -89,6 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function clearErrors(container) {
+    if (!container) return;
     container.querySelectorAll('.input-group').forEach(grp => grp.classList.remove('has-error'));
   }
 
@@ -104,8 +111,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Inicializar en Aprendiz
   setRole('Aprendiz');
 
+  // Limpiar errores al escribir
   document.querySelectorAll('.form-control').forEach(input => {
     ['input', 'change'].forEach(evt => {
       input.addEventListener(evt, () => {
@@ -120,8 +129,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function setSubmitLoading(isLoading) {
     if (!btnSubmit) return;
     btnSubmit.disabled = isLoading;
-    if (btnSubmitText) btnSubmitText.textContent = isLoading ? 'Enviando registro...' : 'Enviar Registro';
-    if (btnSubmitIcon) btnSubmitIcon.className = isLoading ? 'fa-solid fa-spinner' : 'fa-solid fa-arrow-right';
+    if (btnSubmitText) btnSubmitText.textContent = isLoading ? 'Enviando registro...' : 'Confirmar e Inscribirme';
+    if (btnSubmitIcon) btnSubmitIcon.className = isLoading ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-arrow-right';
   }
 
   function showFormError(message) {
@@ -130,7 +139,9 @@ document.addEventListener('DOMContentLoaded', () => {
     formAlert.classList.add('active');
   }
 
-  // Validación y Envío
+  /* ------------------------------------------------------------------------
+     3. VALIDACIÓN Y ENVÍO A GOOGLE SHEETS VIA APPS SCRIPT
+     ------------------------------------------------------------------------ */
   if (bootcampForm) {
     bootcampForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -190,7 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         });
 
-        // Empresa / Entidad (opcional): solo se envía si el invitado la diligenció
+        // Empresa / Entidad (opcional)
         if (empresaInvitado) {
           const empresaVal = empresaInvitado.value.trim();
           if (empresaVal) {
@@ -207,15 +218,13 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if (!GAS_WEB_APP_URL || GAS_WEB_APP_URL.trim() === '' || GAS_WEB_APP_URL.indexOf('PEGA_AQUI_TU_URL') !== -1) {
-        showFormError('El formulario aún no está conectado a la base de datos. Configura GAS_WEB_APP_URL en scripts/script.js (ver INSTRUCCIONES.md).');
+        showFormError('El formulario aún no está conectado a la base de datos. Configura GAS_WEB_APP_URL en scripts/script.js.');
         return;
       }
 
       setSubmitLoading(true);
 
       try {
-        // Content-Type "text/plain" evita el preflight CORS; Apps Script igual
-        // puede leer y parsear el JSON desde e.postData.contents.
         const response = await fetch(GAS_WEB_APP_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -228,7 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
           throw new Error((result && result.message) || 'Respuesta inválida del servidor.');
         }
 
-        // Modal de Éxito
+        // Poblar Modal de Éxito
         if (modalSummaryContent) {
           let summaryHTML = `<div><span class="field">Rol registrado:</span> <span class="val">${currentRole}</span></div>`;
           for (const [key, val] of Object.entries(summaryData)) {
@@ -242,13 +251,14 @@ document.addEventListener('DOMContentLoaded', () => {
         setRole(currentRole);
       } catch (err) {
         console.error('Error al enviar el registro:', err);
-        showFormError('No pudimos registrar tu inscripción. Verifica tu conexión e inténtalo de nuevo. Si el problema persiste, escríbenos.');
+        showFormError('No pudimos registrar tu inscripción. Verifica tu conexión e inténtalo de nuevo.');
       } finally {
         setSubmitLoading(false);
       }
     });
   }
 
+  // Cerrar Modal de Éxito
   if (btnCloseModal && successModal) {
     btnCloseModal.addEventListener('click', () => successModal.classList.remove('active'));
   }
@@ -259,7 +269,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 2. Cuenta Regresiva
+  /* ------------------------------------------------------------------------
+     4. CONTADOR REGRESIVO INTERACTIVO (DÍAS, HORAS, MINUTOS, SEGUNDOS)
+     Target: 22 de Septiembre de 2026 a las 08:00 a.m. (COT / UTC-5)
+     ------------------------------------------------------------------------ */
   const eventDate = new Date('2026-09-22T08:00:00-05:00').getTime();
   const elDays = document.getElementById('cdDays');
   const elHours = document.getElementById('cdHours');
@@ -292,9 +305,9 @@ document.addEventListener('DOMContentLoaded', () => {
   updateCountdown();
   setInterval(updateCountdown, 1000);
 
-  /* ==========================================================================
-     4. MEDIDAS DE SEGURIDAD Y PROTECCIÓN DE CONTENIDO (FRONTEND)
-     ========================================================================== */
+  /* ------------------------------------------------------------------------
+     5. MEDIDAS DE SEGURIDAD Y PROTECCIÓN DE CONTENIDO FRONTEND
+     ------------------------------------------------------------------------ */
 
   // A. Bloqueo de Clic Derecho (Menú contextual)
   document.addEventListener('contextmenu', (e) => {
@@ -339,7 +352,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // C. Bloqueo de Arrastre de Imágenes (Drag & Drop)
+  // C. Bloqueo de Arrastre de Imágenes
   document.addEventListener('dragstart', (e) => {
     if (e.target && (e.target.nodeName === 'IMG' || e.target.closest('img'))) {
       e.preventDefault();

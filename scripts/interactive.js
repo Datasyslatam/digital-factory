@@ -1,51 +1,47 @@
 /* ==========================================================================
-   INTERACTIVE.JS — Bootcamp Digital Factory 2026
-Funcionalidades: Scroll reveal, Partículas, Stats animados,
-    Tilt 3D, Flip countdown, Hero carousel, Hamburger nav, Back-to-top, Progress
+   INTERACTIVE.JS — Experiencia de Usuario, Animaciones y Navegación
+   Bootcamp Digital Factory & IA 2026 (SENA Regional Atlántico)
    ========================================================================== */
 
 (function () {
   'use strict';
 
-  // ══════════════════════════════════════════════════
-  //  PREFERES-REDUCED-MOTION CHECK
-  // ══════════════════════════════════════════════════
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // ══════════════════════════════════════════════════
-  //  1. NAVBAR STICKY — Clases al hacer scroll
-  // ══════════════════════════════════════════════════
-  const navbar = document.querySelector('.navbar');
-  if (navbar) {
+  // --------------------------------------------------------------------------
+  // 1. NAVBAR STICKY & CLASE SCROLLED
+  // --------------------------------------------------------------------------
+  const headerWrapper = document.getElementById('mainHeader');
+  if (headerWrapper) {
     window.addEventListener('scroll', () => {
-      if (window.scrollY > 60) {
-        navbar.classList.add('scrolled');
+      if (window.scrollY > 40) {
+        headerWrapper.classList.add('scrolled');
       } else {
-        navbar.classList.remove('scrolled');
+        headerWrapper.classList.remove('scrolled');
       }
     }, { passive: true });
   }
 
-  // ══════════════════════════════════════════════════
-  //  3. HAMBURGER MENU MÓVIL
-  // ══════════════════════════════════════════════════
+  // --------------------------------------------------------------------------
+  // 2. MENÚ HAMBURGUESA MÓVIL Y OVERLAY
+  // --------------------------------------------------------------------------
   const hamburger = document.getElementById('navHamburger');
-  const navLinks  = document.getElementById('navLinks');
-  const navOverlay = document.getElementById('navOverlay');
+  const navMenu = document.getElementById('navMenu');
+  const navOverlay = document.getElementById('navMobileOverlay');
 
   function openMenu() {
-    if (!hamburger || !navLinks) return;
+    if (!hamburger || !navMenu) return;
     hamburger.classList.add('active');
-    navLinks.classList.add('open');
+    navMenu.classList.add('open');
     if (navOverlay) navOverlay.classList.add('active');
     hamburger.setAttribute('aria-expanded', 'true');
     document.body.style.overflow = 'hidden';
   }
 
   function closeMenu() {
-    if (!hamburger || !navLinks) return;
+    if (!hamburger || !navMenu) return;
     hamburger.classList.remove('active');
-    navLinks.classList.remove('open');
+    navMenu.classList.remove('open');
     if (navOverlay) navOverlay.classList.remove('active');
     hamburger.setAttribute('aria-expanded', 'false');
     document.body.style.overflow = '';
@@ -65,14 +61,13 @@ Funcionalidades: Scroll reveal, Partículas, Stats animados,
     navOverlay.addEventListener('click', closeMenu);
   }
 
-  // Cerrar al hacer clic en link
-  document.querySelectorAll('.nav-close-link').forEach(link => {
+  document.querySelectorAll('.nav-link, .btn-nav-register').forEach(link => {
     link.addEventListener('click', closeMenu);
   });
 
-  // ══════════════════════════════════════════════════
-  //  4. SCROLL PROGRESS BAR
-  // ══════════════════════════════════════════════════
+  // --------------------------------------------------------------------------
+  // 3. BARRA DE PROGRESO DE SCROLL
+  // --------------------------------------------------------------------------
   const progressBar = document.getElementById('scrollProgress');
   if (progressBar) {
     window.addEventListener('scroll', () => {
@@ -83,13 +78,13 @@ Funcionalidades: Scroll reveal, Partículas, Stats animados,
     }, { passive: true });
   }
 
-  // ══════════════════════════════════════════════════
-  //  5. BOTÓN VOLVER ARRIBA
-  // ══════════════════════════════════════════════════
+  // --------------------------------------------------------------------------
+  // 4. BOTÓN VOLVER ARRIBA
+  // --------------------------------------------------------------------------
   const btnBackTop = document.getElementById('btnBackTop');
   if (btnBackTop) {
     window.addEventListener('scroll', () => {
-      if (window.scrollY > 400) {
+      if (window.scrollY > 450) {
         btnBackTop.classList.add('visible');
       } else {
         btnBackTop.classList.remove('visible');
@@ -101,11 +96,11 @@ Funcionalidades: Scroll reveal, Partículas, Stats animados,
     });
   }
 
-  // ══════════════════════════════════════════════════
-  //  6. SCROLL REVEAL — IntersectionObserver
-  // ══════════════════════════════════════════════════
+  // --------------------------------------------------------------------------
+  // 5. SCROLL REVEAL CON INTERSECTION OBSERVER
+  // --------------------------------------------------------------------------
   const revealEls = document.querySelectorAll('.reveal');
-  if (revealEls.length > 0) {
+  if (revealEls.length > 0 && !reducedMotion) {
     const revealObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -114,20 +109,21 @@ Funcionalidades: Scroll reveal, Partículas, Stats animados,
         }
       });
     }, {
-      threshold: 0.12,
-      rootMargin: '0px 0px -40px 0px'
+      threshold: 0.1,
+      rootMargin: '0px 0px -30px 0px'
     });
 
     revealEls.forEach(el => revealObserver.observe(el));
+  } else {
+    revealEls.forEach(el => el.classList.add('visible'));
   }
 
-  // ══════════════════════════════════════════════════
-  //  7. STATS ANIMADOS — Contador al entrar en viewport
-  // ══════════════════════════════════════════════════
+  // --------------------------------------------------------------------------
+  // 6. ANIMACIÓN DE CONTADORES NUMÉRICOS DE ESTADÍSTICAS
+  // --------------------------------------------------------------------------
   function animateCounter(el, target, suffix, duration) {
-    const start  = 0;
-    const step   = (target - start) / (duration / 16);
-    let current  = start;
+    let current = 0;
+    const step = target / (duration / 16);
 
     const interval = setInterval(() => {
       current += step;
@@ -140,46 +136,49 @@ Funcionalidades: Scroll reveal, Partículas, Stats animados,
   }
 
   const statNumbers = document.querySelectorAll('.stat-number');
-  if (statNumbers.length > 0) {
-    const statsStrip = document.querySelector('.stats-strip');
-    if (statsStrip) {
+  if (statNumbers.length > 0 && !reducedMotion) {
+    const metricsGrid = document.querySelector('.metrics-grid');
+    if (metricsGrid) {
       const statsObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
             statNumbers.forEach(el => {
               const raw = el.textContent.trim();
-              // Detectar número + sufijo (p.ej. "48h", "8-6", "5", "2")
+              if (raw.includes('-')) {
+                // Rango como "8-6", mantener texto estilizado
+                return;
+              }
               const match = raw.match(/^(\d+)(.*)$/);
               if (match) {
-                const num    = parseInt(match[1], 10);
+                const num = parseInt(match[1], 10);
                 const suffix = match[2] || '';
-                animateCounter(el, num, suffix, 1200);
+                animateCounter(el, num, suffix, 1000);
               }
             });
             statsObserver.unobserve(entry.target);
           }
         });
-      }, { threshold: 0.4 });
+      }, { threshold: 0.25 });
 
-      statsObserver.observe(statsStrip);
+      statsObserver.observe(metricsGrid);
     }
   }
 
-  // ══════════════════════════════════════════════════
-  //  8. EFECTO 3D TILT EN CARDS
-  // ══════════════════════════════════════════════════
+  // --------------------------------------------------------------------------
+  // 7. EFECTO 3D TILT EN TARJETAS
+  // --------------------------------------------------------------------------
   if (!reducedMotion) {
     document.querySelectorAll('.tilt-card').forEach(card => {
       card.addEventListener('mousemove', (e) => {
-        const rect   = card.getBoundingClientRect();
-        const cx     = rect.left + rect.width  / 2;
-        const cy     = rect.top  + rect.height / 2;
-        const dx     = (e.clientX - cx) / (rect.width  / 2);
-        const dy     = (e.clientY - cy) / (rect.height / 2);
-        const rotX   = -dy * 8;
-        const rotY   =  dx * 8;
+        const rect = card.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const dx = (e.clientX - cx) / (rect.width / 2);
+        const dy = (e.clientY - cy) / (rect.height / 2);
+        const rotX = -dy * 6;
+        const rotY = dx * 6;
 
-        card.style.transform = `perspective(800px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateY(-8px)`;
+        card.style.transform = `perspective(800px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateY(-4px)`;
       });
 
       card.addEventListener('mouseleave', () => {
@@ -188,267 +187,77 @@ Funcionalidades: Scroll reveal, Partículas, Stats animados,
     });
   }
 
-  // ══════════════════════════════════════════════════
-  //  9. COUNTDOWN CON ANIMACIÓN FLIP
-  // ══════════════════════════════════════════════════
-  // (complementa el countdown existente en script.js)
-  const cdEls = {
-    days:    document.getElementById('cdDays'),
-    hours:   document.getElementById('cdHours'),
-    minutes: document.getElementById('cdMinutes'),
-    seconds: document.getElementById('cdSeconds')
-  };
+  // --------------------------------------------------------------------------
+  // 8. PESTAÑAS DE LA AGENDA (DÍA 1 / DÍA 2)
+  // --------------------------------------------------------------------------
+  const agendaTabs = document.querySelectorAll('.agenda-tab-btn');
+  const agendaDia1 = document.getElementById('agendaDia1');
+  const agendaDia2 = document.getElementById('agendaDia2');
 
-  const prevValues = { days: '', hours: '', minutes: '', seconds: '' };
+  agendaTabs.forEach(btn => {
+    btn.addEventListener('click', () => {
+      agendaTabs.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
 
-  function triggerFlip(key, newVal) {
-    const el = cdEls[key];
-    if (!el) return;
-    if (prevValues[key] !== newVal) {
-      prevValues[key] = newVal;
-      el.classList.remove('flip');
-      void el.offsetWidth; // reflow
-      el.classList.add('flip');
-    }
-  }
-
-  // Observar cambios en los elementos del countdown
-  const countdownObserver = new MutationObserver((mutations) => {
-    mutations.forEach(m => {
-      const el = m.target;
-      if (el.id === 'cdDays')    triggerFlip('days',    el.textContent);
-      if (el.id === 'cdHours')   triggerFlip('hours',   el.textContent);
-      if (el.id === 'cdMinutes') triggerFlip('minutes', el.textContent);
-      if (el.id === 'cdSeconds') triggerFlip('seconds', el.textContent);
+      const target = btn.getAttribute('data-target');
+      if (target === '#agendaDia1') {
+        if (agendaDia1) agendaDia1.style.display = 'flex';
+        if (agendaDia2) agendaDia2.style.display = 'none';
+      } else if (target === '#agendaDia2') {
+        if (agendaDia1) agendaDia1.style.display = 'none';
+        if (agendaDia2) agendaDia2.style.display = 'flex';
+      }
     });
   });
 
-  Object.values(cdEls).forEach(el => {
-    if (el) countdownObserver.observe(el, { childList: true, subtree: true, characterData: true });
-  });
-
-  // ══════════════════════════════════════════════════
-  //  10. HERO CAROUSEL DE IMÁGENES (banner dinámico)
-  // ══════════════════════════════════════════════════
-  const carousel = document.getElementById('heroCarousel');
-  if (carousel) {
-    const track = carousel.querySelector('.hero-carousel-track');
-
-    // Imágenes del banner (source/)
-    const HERO_SLIDES = [
-      {
-        img: 'source/act1.jpg',
-        tag: 'IA & Automatización',
-        caption: 'Registro y acreditación de participantes'
-      },
-      {
-        img: 'source/act2.jpg',
-        tag: 'Industria 4.0',
-        caption: 'Talleres aplicados en el Nodo TIC'
-      },
-      {
-        img: 'source/act3.jpg',
-        tag: 'Mentoría Especializada',
-        caption: 'Acompañamiento de expertos del SENA'
-      },
-      {
-        img: 'source/act4.jpg',
-        tag: 'Robótica',
-        caption: 'Soluciones robóticas para la industria'
-      },
-      {
-        img: 'source/act5.jpg',
-        tag: 'Hackathon',
-        caption: 'Retos productivos y prototipado rápido'
-      },
-      {
-        img: 'source/act6.jpg',
-        tag: 'Trabajo en Equipo',
-        caption: 'Aprendices construyendo soluciones digitales'
-      },
-      {
-        img: 'source/act7.jpg',
-        tag: 'Demo Day',
-        caption: 'Presentaciones finales ante el jurado'
-      },
-      {
-        img: 'source/informacion.png',
-        tag: 'Bootcamp 2026',
-        caption: 'Información oficial del evento'
-      }
-    ];
-
-    let current = 0;
-    let autoplayTimer = null;
-    const AUTOPLAY_MS = 5000;
-
-    function buildSlides() {
-      HERO_SLIDES.forEach((slide, i) => {
-        const div = document.createElement('div');
-        div.className = 'hero-slide' + (i === 0 ? ' active' : '');
-        div.setAttribute('role', 'group');
-        div.setAttribute('aria-roledescription', 'slide');
-        div.setAttribute('aria-label', 'Imagen ' + (i + 1) + ' de ' + HERO_SLIDES.length);
-
-        const bg = document.createElement('div');
-        bg.className = 'hero-slide-bg';
-        bg.style.backgroundImage = "url('" + slide.img + "')";
-        div.appendChild(bg);
-
-        const overlay = document.createElement('div');
-        overlay.className = 'hero-slide-overlay';
-        div.appendChild(overlay);
-
-        const info = document.createElement('div');
-        info.className = 'hero-slide-info';
-        info.innerHTML = '<span class="hero-slide-tag">' + slide.tag + '</span>' +
-                         '<span class="hero-slide-caption">' + slide.caption + '</span>';
-        div.appendChild(info);
-
-        track.appendChild(div);
-      });
-    }
-
-    function goTo(index) {
-      const slides = track.querySelectorAll('.hero-slide');
-      if (!slides.length) return;
-
-      const next = (index + slides.length) % slides.length;
-      slides[current].classList.remove('active');
-      slides[next].classList.add('active');
-      current = next;
-    }
-
-    function startAutoplay() {
-      if (reducedMotion) return;
-      stopAutoplay();
-      autoplayTimer = setInterval(() => goTo(current + 1), AUTOPLAY_MS);
-    }
-
-    function stopAutoplay() {
-      if (autoplayTimer) {
-        clearInterval(autoplayTimer);
-        autoplayTimer = null;
-      }
-    }
-
-    buildSlides();
-    startAutoplay();
-  }
-
-  // ══════════════════════════════════════════════════
-  //  11. PARTÍCULAS FLOTANTES EN EL HERO
-  // ══════════════════════════════════════════════════
-  if (!reducedMotion) {
-    const canvas = document.getElementById('particles-canvas');
-    if (canvas) {
-      const ctx    = canvas.getContext('2d');
-      const hero   = canvas.closest('.hero-banner-card');
-      let W, H, particles;
-
-      function resize() {
-        if (!hero) return;
-        W = canvas.width  = hero.offsetWidth;
-        H = canvas.height = hero.offsetHeight;
-      }
-
-      const COLORS = ['rgba(232,253,54,', 'rgba(33,230,193,', 'rgba(123,44,191,'];
-
-      function createParticles(n) {
-        return Array.from({ length: n }, () => ({
-          x:  Math.random() * W,
-          y:  Math.random() * H,
-          r:  Math.random() * 2 + 0.5,
-          vx: (Math.random() - 0.5) * 0.4,
-          vy: (Math.random() - 0.5) * 0.4,
-          color: COLORS[Math.floor(Math.random() * COLORS.length)],
-          alpha: Math.random() * 0.5 + 0.1,
-        }));
-      }
-
-      function drawParticles() {
-        ctx.clearRect(0, 0, W, H);
-        particles.forEach(p => {
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-          ctx.fillStyle = p.color + p.alpha + ')';
-          ctx.fill();
-
-          p.x += p.vx;
-          p.y += p.vy;
-
-          if (p.x < 0)  p.x = W;
-          if (p.x > W)  p.x = 0;
-          if (p.y < 0)  p.y = H;
-          if (p.y > H)  p.y = 0;
-        });
-        requestAnimationFrame(drawParticles);
-      }
-
-      resize();
-      particles = createParticles(55);
-      drawParticles();
-
-      const resizeObserver = new ResizeObserver(resize);
-      if (hero) resizeObserver.observe(hero);
-    }
-  }
-
-  // ══════════════════════════════════════════════════
-  //  12. PILLAR TAGS — Hover dinámico
-  // ══════════════════════════════════════════════════
-  const pillarTags = document.querySelectorAll('.pillar-tag');
-  pillarTags.forEach(tag => {
-    // Wrapping de spans si no existen
-    const text = tag.innerHTML;
-    const hasSpan = tag.querySelector('span');
-    if (!hasSpan) {
-      const icon = tag.querySelector('i');
-      if (icon) {
-        const textNode = Array.from(tag.childNodes).find(n => n.nodeType === 3 && n.textContent.trim());
-        if (textNode) {
-          const span = document.createElement('span');
-          span.textContent = textNode.textContent;
-          tag.replaceChild(span, textNode);
-        }
-      }
-    }
-  });
-
-  // ══════════════════════════════════════════════════
-  //  13. SMOOTH ANCHOR SCROLL — Para nav links
-  // ══════════════════════════════════════════════════
+  // --------------------------------------------------------------------------
+  // 9. SMOOTH SCROLL PARA ENLACES ANCLA
+  // --------------------------------------------------------------------------
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', (e) => {
-      const target = document.querySelector(anchor.getAttribute('href'));
-      if (target) {
+      const targetId = anchor.getAttribute('href');
+      if (targetId === '#' || targetId === '') return;
+      const targetEl = document.querySelector(targetId);
+      if (targetEl) {
         e.preventDefault();
-        const navH   = navbar ? navbar.offsetHeight : 0;
-        const top    = target.getBoundingClientRect().top + window.scrollY - navH - 16;
-        window.scrollTo({ top, behavior: 'smooth' });
+        const navHeight = headerWrapper ? headerWrapper.offsetHeight : 0;
+        const elementPosition = targetEl.getBoundingClientRect().top + window.scrollY;
+        const offsetPosition = elementPosition - navHeight - 12;
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
       }
     });
   });
 
-  // ══════════════════════════════════════════════════
-  //  14. DYNAMIC ACTIVE NAV LINK (highlight on scroll)
-  // ══════════════════════════════════════════════════
-  const sections    = document.querySelectorAll('section[id]');
-  const navAnchors  = document.querySelectorAll('.nav-links a[href^="#"]');
+  // --------------------------------------------------------------------------
+  // 10. SINCRONIZACIÓN DE ENLACE ACTIVO CON EL SCROLL
+  // --------------------------------------------------------------------------
+  const sections = document.querySelectorAll('section[id], header[id]');
+  const navLinks = document.querySelectorAll('.nav-menu .nav-link');
 
-  if (sections.length && navAnchors.length) {
-    const sectionObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const id = entry.target.id;
-          navAnchors.forEach(a => {
-            a.classList.toggle('nav-active', a.getAttribute('href') === '#' + id);
+  if (sections.length && navLinks.length) {
+    window.addEventListener('scroll', () => {
+      const scrollPos = window.scrollY + 120;
+      sections.forEach(section => {
+        const top = section.offsetTop;
+        const height = section.offsetHeight;
+        const id = section.getAttribute('id');
+
+        if (scrollPos >= top && scrollPos < top + height) {
+          navLinks.forEach(link => {
+            const href = link.getAttribute('href');
+            if (href === '#' + id) {
+              link.classList.add('active');
+            } else {
+              link.classList.remove('active');
+            }
           });
         }
       });
-    }, { threshold: 0.35 });
-
-    sections.forEach(s => sectionObserver.observe(s));
+    }, { passive: true });
   }
 
 })();
