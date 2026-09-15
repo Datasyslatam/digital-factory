@@ -7,7 +7,8 @@
  * sitio (index.html), guarda cada registro en la hoja correspondiente
  * (Aprendices o Invitados), genera un código QR con el tipo y número de
  * documento de la persona (para evitar exponer IDs internos/consecutivos) y
- * envía un correo de confirmación con ese QR adjunto.
+ * envía un correo de confirmación con el QR incrustado en el cuerpo del
+ * mensaje (no como archivo adjunto).
  *
  * Instrucciones completas de instalación: ver INSTRUCCIONES.md
  * =============================================================================
@@ -86,7 +87,8 @@ function registrarAprendiz(payload) {
     'Número de Documento', 'Centro SENA', 'Correo Electrónico', 'Código QR (contenido)'
   ]);
 
-  if (CONFIG.EVITAR_DUPLICADOS && yaRegistrado_(sheet, numeroDocumento, 4)) {
+  const colNumeroDocumento = columnaEncabezado_(sheet, 'Número de Documento');
+  if (CONFIG.EVITAR_DUPLICADOS && colNumeroDocumento > 0 && yaRegistrado_(sheet, numeroDocumento, colNumeroDocumento)) {
     return jsonResponse({ result: 'error', message: 'Este número de documento ya fue registrado como Aprendiz.' });
   }
 
@@ -131,7 +133,8 @@ function registrarInvitado(payload) {
     'Número de Documento', 'Correo Electrónico', 'Código QR (contenido)'
   ]);
 
-  if (CONFIG.EVITAR_DUPLICADOS && yaRegistrado_(sheet, numeroDocumento, 3)) {
+  const colNumeroDocumento = columnaEncabezado_(sheet, 'Número de Documento');
+  if (CONFIG.EVITAR_DUPLICADOS && colNumeroDocumento > 0 && yaRegistrado_(sheet, numeroDocumento, colNumeroDocumento)) {
     return jsonResponse({ result: 'error', message: 'Este número de documento ya fue registrado como Invitado.' });
   }
 
@@ -158,12 +161,15 @@ function enviarCorreoConfirmacion_(datos) {
   const qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=360x360&margin=12&data='
     + encodeURIComponent(datos.qrContenido);
 
-  let qrBlob;
+  // La imagen del QR se incrusta como "data URI" (base64) directamente en el
+  // HTML del mensaje: así el QR aparece DENTRO del correo y nunca como un
+  // archivo adjunto (no se usan attachments ni imágenes "inline/cid").
+  let qrDataUri = '';
   try {
-    qrBlob = UrlFetchApp.fetch(qrUrl).getBlob().setName('qr-acceso.png');
+    const qrBlob = UrlFetchApp.fetch(qrUrl).getBlob().setContentType('image/png');
+    qrDataUri = 'data:image/png;base64,' + Utilities.base64Encode(qrBlob.getBytes());
   } catch (err) {
-    console.error('No se pudo generar el QR, se enviará el correo sin imagen adjunta.', err);
-    qrBlob = null;
+    console.error('No se pudo generar el QR; el correo se enviará con una nota indicativa.', err);
   }
 
   const asunto = 'Confirmación de inscripción · ' + CONFIG.EVENTO_NOMBRE;
@@ -180,19 +186,19 @@ function enviarCorreoConfirmacion_(datos) {
         '<li><strong>Lugar:</strong> ' + CONFIG.EVENTO_LUGAR + '</li>' +
       '</ul>' +
       '<p>Presenta el siguiente código QR en el ingreso al evento (puedes mostrarlo desde tu celular o impreso):</p>' +
-      (qrBlob
-        ? '<div style="text-align:center; margin:20px 0;"><img src="cid:qrAcceso" width="220" height="220" alt="Código QR de acceso" /></div>'
+      (qrDataUri
+        ? '<div style="text-align:center; margin:20px 0;"><img src="' + qrDataUri + '" width="220" height="220" alt="Código QR de acceso" /></div>'
         : '<p><em>No fue posible generar la imagen del QR; contacta a la organización con tu número de documento.</em></p>') +
       '<p style="font-size:12px; color:#666;">Este código corresponde a tu tipo y número de documento y es personal e intransferible.</p>' +
       '<p>¡Nos vemos en el Bootcamp!<br>' + CONFIG.CORREO_REMITENTE_NOMBRE + '</p>' +
     '</div>';
 
-  const opciones = { htmlBody: cuerpoHtml, name: CONFIG.CORREO_REMITENTE_NOMBRE };
-  if (qrBlob) {
-    opciones.inlineImages = { qrAcceso: qrBlob };
-  }
-
-  GmailApp.sendEmail(datos.correo, asunto, 'Tu inscripción fue confirmada. Abre este correo en un cliente compatible con HTML para ver tu código QR.', opciones);
+  GmailApp.sendEmail(
+    datos.correo,
+    asunto,
+    'Tu inscripción fue confirmada. Revisa este correo para ver tu código QR de acceso incrustado; si no lo ves, activa la descarga/imagen en tu cliente de correo.',
+    { htmlBody: cuerpoHtml, name: CONFIG.CORREO_REMITENTE_NOMBRE }
+  );
 }
 
 /* -------------------------------- UTILIDADES -------------------------------- */
@@ -218,6 +224,15 @@ function yaRegistrado_(sheet, numeroDocumento, columnaNumeroDoc) {
   return valores.some(function (fila) {
     return String(fila[0]).trim() === numeroDocumento;
   });
+}
+
+function columnaEncabezado_(sheet, encabezado) {
+  if (sheet.getLastRow() === 0) return -1;
+  const filaEncabezados = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  for (let i = 0; i < filaEncabezados.length; i++) {
+    if (String(filaEncabezados[i]).trim() === encabezado) return i + 1;
+  }
+  return -1;
 }
 
 function limpiar(valor) {
