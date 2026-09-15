@@ -249,10 +249,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (successModal) successModal.classList.add('active');
-        if (result.emailEnviado === false) {
+        if (result.emailEnviado === false || result.qrOk === false) {
           const qrNote = document.getElementById('modalQrNoteText');
           if (qrNote) {
-            qrNote.innerHTML = 'Tu registro quedó guardado, pero no pudimos enviar el correo con tu <strong>código QR</strong>. Por favor contacta a la organización (revisa también tu carpeta de correo no deseado).';
+            qrNote.innerHTML = 'Tu registro quedó guardado, pero no pudimos <strong>enviar el correo con tu código QR</strong> (o el QR no pudo generarse). Por favor contacta a la organización (revisa también tu carpeta de correo no deseado).';
           }
         }
         bootcampForm.reset();

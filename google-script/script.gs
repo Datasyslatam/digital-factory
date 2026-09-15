@@ -105,7 +105,7 @@ function registrarAprendiz(payload) {
   });
   registrarEstadoCorreo_(sheet, resCorreo);
 
-  return jsonResponse({ result: 'success', emailEnviado: resCorreo.enviado, emailError: resCorreo.error });
+  return jsonResponse({ result: 'success', emailEnviado: resCorreo.enviado, emailError: resCorreo.error, qrOk: resCorreo.qrOk, qrError: resCorreo.qrError });
 }
 
 function registrarInvitado(payload) {
@@ -153,7 +153,7 @@ function registrarInvitado(payload) {
   });
   registrarEstadoCorreo_(sheet, resCorreo);
 
-  return jsonResponse({ result: 'success', emailEnviado: resCorreo.enviado, emailError: resCorreo.error });
+  return jsonResponse({ result: 'success', emailEnviado: resCorreo.enviado, emailError: resCorreo.error, qrOk: resCorreo.qrOk, qrError: resCorreo.qrError });
 }
 
 /* ------------------------------- CORREO + QR ------------------------------- */
@@ -161,21 +161,17 @@ function registrarInvitado(payload) {
 function enviarCorreoConfirmacion_(datos) {
   // El QR codifica "TIPO-NUMERO_DE_DOCUMENTO" en vez de un ID interno
   // consecutivo, para que no se puedan adivinar ni enumerar otros registros.
-  const qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=360x360&margin=12&data='
-    + encodeURIComponent(datos.qrContenido);
+  const qrContenido = datos.qrContenido;
 
   // El QR se incrusta en el cuerpo del correo mediante "inlineImages" (clave
   // "cid:qrAcceso" referenciada en el HTML). Gmail NO renderiza imágenes
-  // base64 "data URI" en el cuerpo, por lo que ese método se descarta. El
-  // correo se envía SIN adjuntos para que el QR aparezca dentro del mensaje.
-  let qrBlob = null;
-  try {
-    qrBlob = UrlFetchApp.fetch(qrUrl).getBlob()
-      .setContentType('image/png')
-      .setName('qr-acceso.png');
-  } catch (err) {
-    console.error('No se pudo generar la imagen del QR; el correo se enviará con una nota indicativa.', err);
-    qrBlob = null;
+  // base64 "data URI" en el cuerpo, por lo que ese método se descarta. La
+  // generación intenta varios proveedores en cascada para evitar que el
+  // correo quede sin QR por un bloqueo/limite de un proveedor externo.
+  const qr = generarImagenQR_(qrContenido);
+  const qrBlob = qr.blob;
+  if (!qrBlob) {
+    console.error('NO se pudo generar el QR para "' + qrContenido + '" (' + qr.error + ')');
   }
 
   const asunto = 'Confirmación de inscripción · ' + CONFIG.EVENTO_NOMBRE;
@@ -204,8 +200,8 @@ function enviarCorreoConfirmacion_(datos) {
     opciones.inlineImages = { qrAcceso: qrBlob };
   }
 
-  // El resultado de la entrega se reporta para que el frontend pueda avisar
-  // si la cuenta del script no pudo despachar el correo.
+  // El resultado de la entrega se reporta para que el frontend y la hoja
+  // puedan avisar si el correo o el QR no pudieron generarse/despacharse.
   try {
     GmailApp.sendEmail(
       datos.correo,
@@ -213,12 +209,38 @@ function enviarCorreoConfirmacion_(datos) {
       'Tu inscripción fue confirmada. Abre este correo en un cliente compatible con HTML (o descarga las imágenes) para ver tu código QR de acceso.',
       opciones
     );
-    console.log('Correo de confirmación ENVIADO a ' + datos.correo);
-    return { enviado: true, error: '' };
+    const log = 'Correo de confirmación ENVIADO a ' + datos.correo + (qrBlob ? ' (con QR)' : ' (SIN QR: ' + qr.error + ')');
+    console.log(log);
+    return { enviado: true, error: '', qrOk: !!qrBlob, qrError: qrBlob ? '' : qr.error };
   } catch (err) {
     console.error('Error al enviar el correo de confirmación a ' + datos.correo + ':', err);
-    return { enviado: false, error: String(err && err.message || err) };
+    return { enviado: false, error: String(err && err.message || err), qrOk: !!qrBlob, qrError: qrBlob ? '' : qr.error };
   }
+}
+
+function generarImagenQR_(contenido) {
+  const proveedores = [
+    'https://api.qrserver.com/v1/create-qr-code/?size=360x360&margin=12&data=' + encodeURIComponent(contenido),
+    'https://quickchart.io/qr?text=' + encodeURIComponent(contenido) + '&size=360&margin=6'
+  ];
+  let ultimoError = '';
+  for (let i = 0; i < proveedores.length; i++) {
+    try {
+      const blob = UrlFetchApp.fetch(proveedores[i])
+        .getBlob()
+        .setContentType('image/png')
+        .setName('qr-acceso.png');
+      if (blob.getBytes().length < 50) {
+        ultimoError = 'Respuesta vacía o inválida del proveedor ' + (i + 1);
+        continue;
+      }
+      return { blob: blob, error: '' };
+    } catch (err) {
+      ultimoError = String(err && err.message || err);
+      console.error('El proveedor de QR ' + (i + 1) + ' falló: ' + proveedores[i], err);
+    }
+  }
+  return { blob: null, error: ultimoError };
 }
 
 /* -------------------------------- UTILIDADES -------------------------------- */
@@ -256,7 +278,15 @@ function registrarEstadoCorreo_(sheet, resCorreo) {
   if (colEstado <= 0) return;
   const fila = sheet.getLastRow();
   if (fila < 2) return;
-  sheet.getRange(fila, colEstado).setValue(resCorreo.enviado ? 'Enviado' : 'ERROR: ' + resCorreo.error);
+  let estado;
+  if (!resCorreo.enviado) {
+    estado = 'ERROR: ' + resCorreo.error;
+  } else if (resCorreo.qrOk) {
+    estado = 'Enviado (con QR)';
+  } else {
+    estado = 'Enviado (SIN QR: ' + resCorreo.qrError + ')';
+  }
+  sheet.getRange(fila, colEstado).setValue(estado);
 }
 
 function yaRegistrado_(sheet, numeroDocumento, columnaNumeroDoc) {
