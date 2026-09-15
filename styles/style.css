@@ -2057,6 +2057,10 @@ select.form-control option {
   .footer-top {
     grid-template-columns: 1fr 1fr;
   }
+
+  .impact-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 860px) {
@@ -2139,6 +2143,11 @@ select.form-control option {
     grid-template-columns: repeat(2, 1fr);
     gap: 18px;
   }
+
+  .agenda-tabs-nav {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
 }
 
 @media (max-width: 640px) {
@@ -2213,5 +2222,67 @@ select.form-control option {
   .footer-bottom-bar {
     flex-direction: column;
     text-align: center;
+  }
+
+  /* Compactar navbar: solo logo + CTA + hamburguesa */
+  .navbar {
+    gap: 12px;
+  }
+
+  .nav-brand-group {
+    gap: 10px;
+  }
+
+  .nav-divider {
+    display: none;
+  }
+
+  .nav-brand-text {
+    display: none;
+  }
+
+  .btn-nav-register {
+    padding: 10px 16px;
+    font-size: 0.82rem;
+  }
+
+  /* Tabs de la agenda: apilar verticalmente */
+  .agenda-tabs-nav {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .agenda-tab-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 16px;
+    text-align: center;
+  }
+
+  /* Contador: permitir salto de línea para no desbordar */
+  .countdown-digits-strip {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .cd-digit-box {
+    min-width: 58px;
+    padding: 8px 10px;
+  }
+
+  .cd-number-val {
+    font-size: 1.5rem;
+  }
+
+  .cd-dots-sep {
+    font-size: 1.2rem;
+  }
+
+  /* Modal: más aire en pantallas pequeñas */
+  .modal-card {
+    padding: 28px 20px;
   }
 }
