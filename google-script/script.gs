@@ -97,14 +97,14 @@ function registrarAprendiz(payload) {
     new Date(), numFicha, nombreCompleto, tipoDocumento, numeroDocumento, centro, correo, qrContenido
   ]);
 
-  enviarCorreoConfirmacion_({
+  const resCorreo = enviarCorreoConfirmacion_({
     correo: correo,
     nombreCompleto: nombreCompleto,
     rolEtiqueta: 'Aprendiz SENA · Ficha ' + numFicha,
     qrContenido: qrContenido
   });
 
-  return jsonResponse({ result: 'success' });
+  return jsonResponse({ result: 'success', emailEnviado: resCorreo.enviado, emailError: resCorreo.error });
 }
 
 function registrarInvitado(payload) {
@@ -143,14 +143,14 @@ function registrarInvitado(payload) {
     new Date(), empresa || '(No aplica)', nombreCompleto, tipoDocumento, numeroDocumento, correo, qrContenido
   ]);
 
-  enviarCorreoConfirmacion_({
+  const resCorreo = enviarCorreoConfirmacion_({
     correo: correo,
     nombreCompleto: nombreCompleto,
     rolEtiqueta: empresa ? 'Invitado · ' + empresa : 'Invitado',
     qrContenido: qrContenido
   });
 
-  return jsonResponse({ result: 'success' });
+  return jsonResponse({ result: 'success', emailEnviado: resCorreo.enviado, emailError: resCorreo.error });
 }
 
 /* ------------------------------- CORREO + QR ------------------------------- */
@@ -161,15 +161,18 @@ function enviarCorreoConfirmacion_(datos) {
   const qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=360x360&margin=12&data='
     + encodeURIComponent(datos.qrContenido);
 
-  // La imagen del QR se incrusta como "data URI" (base64) directamente en el
-  // HTML del mensaje: así el QR aparece DENTRO del correo y nunca como un
-  // archivo adjunto (no se usan attachments ni imágenes "inline/cid").
-  let qrDataUri = '';
+  // El QR se incrusta en el cuerpo del correo mediante "inlineImages" (clave
+  // "cid:qrAcceso" referenciada en el HTML). Gmail NO renderiza imágenes
+  // base64 "data URI" en el cuerpo, por lo que ese método se descarta. El
+  // correo se envía SIN adjuntos para que el QR aparezca dentro del mensaje.
+  let qrBlob = null;
   try {
-    const qrBlob = UrlFetchApp.fetch(qrUrl).getBlob().setContentType('image/png');
-    qrDataUri = 'data:image/png;base64,' + Utilities.base64Encode(qrBlob.getBytes());
+    qrBlob = UrlFetchApp.fetch(qrUrl).getBlob()
+      .setContentType('image/png')
+      .setName('qr-acceso.png');
   } catch (err) {
-    console.error('No se pudo generar el QR; el correo se enviará con una nota indicativa.', err);
+    console.error('No se pudo generar la imagen del QR; el correo se enviará con una nota indicativa.', err);
+    qrBlob = null;
   }
 
   const asunto = 'Confirmación de inscripción · ' + CONFIG.EVENTO_NOMBRE;
@@ -186,19 +189,32 @@ function enviarCorreoConfirmacion_(datos) {
         '<li><strong>Lugar:</strong> ' + CONFIG.EVENTO_LUGAR + '</li>' +
       '</ul>' +
       '<p>Presenta el siguiente código QR en el ingreso al evento (puedes mostrarlo desde tu celular o impreso):</p>' +
-      (qrDataUri
-        ? '<div style="text-align:center; margin:20px 0;"><img src="' + qrDataUri + '" width="220" height="220" alt="Código QR de acceso" /></div>'
+      (qrBlob
+        ? '<div style="text-align:center; margin:20px 0;"><img src="cid:qrAcceso" width="220" height="220" alt="Código QR de acceso" /></div>'
         : '<p><em>No fue posible generar la imagen del QR; contacta a la organización con tu número de documento.</em></p>') +
       '<p style="font-size:12px; color:#666;">Este código corresponde a tu tipo y número de documento y es personal e intransferible.</p>' +
       '<p>¡Nos vemos en el Bootcamp!<br>' + CONFIG.CORREO_REMITENTE_NOMBRE + '</p>' +
     '</div>';
 
-  GmailApp.sendEmail(
-    datos.correo,
-    asunto,
-    'Tu inscripción fue confirmada. Revisa este correo para ver tu código QR de acceso incrustado; si no lo ves, activa la descarga/imagen en tu cliente de correo.',
-    { htmlBody: cuerpoHtml, name: CONFIG.CORREO_REMITENTE_NOMBRE }
-  );
+  const opciones = { htmlBody: cuerpoHtml, name: CONFIG.CORREO_REMITENTE_NOMBRE };
+  if (qrBlob) {
+    opciones.inlineImages = { qrAcceso: qrBlob };
+  }
+
+  // El resultado de la entrega se reporta para que el frontend pueda avisar
+  // si la cuenta del script no pudo despachar el correo.
+  try {
+    GmailApp.sendEmail(
+      datos.correo,
+      asunto,
+      'Tu inscripción fue confirmada. Abre este correo en un cliente compatible con HTML (o descarga las imágenes) para ver tu código QR de acceso.',
+      opciones
+    );
+    return { enviado: true, error: '' };
+  } catch (err) {
+    console.error('Error al enviar el correo de confirmación a ' + datos.correo + ':', err);
+    return { enviado: false, error: String(err && err.message || err) };
+  }
 }
 
 /* -------------------------------- UTILIDADES -------------------------------- */
@@ -269,31 +285,4 @@ function setupSheets() {
     'Fecha de Registro', 'Empresa o Entidad', 'Nombre Completo', 'Tipo de Documento',
     'Número de Documento', 'Correo Electrónico', 'Código QR (contenido)'
   ]);
-}
-
-/**
- * Diagnóstico de correo. Ejecuta desde el editor de Apps Script
- * seleccionando esta función y pulsando Ejecutar (sin escribir nada).
- * El correo de prueba llegará a TU PROPIO correo (el de la cuenta que
- * ejecuta el script). También acepta un destinatario concreto:
- *     enviarCorreoPrueba("otrocorreo@gmail.com")
- * Si se envía, en Registros saldrá "Correo de prueba ENVIADO a ...".
- * Si falla, saldrá el error exacto (cuota, permisos, dirección...).
- */
-function enviarCorreoPrueba(direccionDestino) {
-  const destino = String(direccionDestino || Session.getActiveUser().getEmail() || Session.getEffectiveUser().getEmail() || '').trim();
-  if (!destino || destino.indexOf('@') === -1) {
-    console.log('No se pudo determinar el destinatario. Ejecuta: enviarCorreoPrueba("tucorreo@gmail.com")');
-    return;
-  }
-  try {
-    GmailApp.sendEmail(destino, 'Prueba · Bootcamp Digital Factory 2026',
-      'Correo de prueba del backend de inscripciones. Si lo ves, el envío funciona.',
-      { name: CONFIG.CORREO_REMITENTE_NOMBRE });
-    console.log('Correo de prueba ENVIADO a ' + destino);
-    return 'ENVIADO a ' + destino;
-  } catch (err) {
-    console.error('ERROR al enviar el correo de prueba:', err.message);
-    return 'ERROR: ' + err.message;
-  }
 }
