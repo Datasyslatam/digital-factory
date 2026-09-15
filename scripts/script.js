@@ -234,7 +234,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const result = await response.json();
 
         if (!result || result.result !== 'success') {
-          throw new Error((result && result.message) || 'Respuesta inválida del servidor.');
+          const serverMessage = (result && result.message) || 'El servidor no reconoció el registro. Inténtalo de nuevo.';
+          showFormError(serverMessage);
+          return;
         }
 
         // Poblar Modal de Éxito
