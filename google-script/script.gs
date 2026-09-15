@@ -10,7 +10,6 @@
  * envía un correo de confirmación con el QR incrustado en el cuerpo del
  * mensaje (no como archivo adjunto).
  *
- * Instrucciones completas de instalación: ver INSTRUCCIONES.md
  * =============================================================================
  */
 
@@ -84,7 +83,8 @@ function registrarAprendiz(payload) {
 
   const sheet = getSheet_(CONFIG.SHEET_APRENDICES, [
     'Fecha de Registro', 'Número de Ficha', 'Nombre Completo', 'Tipo de Documento',
-    'Número de Documento', 'Centro SENA', 'Correo Electrónico', 'Código QR (contenido)'
+    'Número de Documento', 'Centro SENA', 'Correo Electrónico', 'Código QR (contenido)',
+    'Estado del correo'
   ]);
 
   const colNumeroDocumento = columnaEncabezado_(sheet, 'Número de Documento');
@@ -103,6 +103,7 @@ function registrarAprendiz(payload) {
     rolEtiqueta: 'Aprendiz SENA · Ficha ' + numFicha,
     qrContenido: qrContenido
   });
+  registrarEstadoCorreo_(sheet, resCorreo);
 
   return jsonResponse({ result: 'success', emailEnviado: resCorreo.enviado, emailError: resCorreo.error });
 }
@@ -130,7 +131,8 @@ function registrarInvitado(payload) {
 
   const sheet = getSheet_(CONFIG.SHEET_INVITADOS, [
     'Fecha de Registro', 'Empresa o Entidad', 'Nombre Completo', 'Tipo de Documento',
-    'Número de Documento', 'Correo Electrónico', 'Código QR (contenido)'
+    'Número de Documento', 'Correo Electrónico', 'Código QR (contenido)',
+    'Estado del correo'
   ]);
 
   const colNumeroDocumento = columnaEncabezado_(sheet, 'Número de Documento');
@@ -149,6 +151,7 @@ function registrarInvitado(payload) {
     rolEtiqueta: empresa ? 'Invitado · ' + empresa : 'Invitado',
     qrContenido: qrContenido
   });
+  registrarEstadoCorreo_(sheet, resCorreo);
 
   return jsonResponse({ result: 'success', emailEnviado: resCorreo.enviado, emailError: resCorreo.error });
 }
@@ -210,6 +213,7 @@ function enviarCorreoConfirmacion_(datos) {
       'Tu inscripción fue confirmada. Abre este correo en un cliente compatible con HTML (o descarga las imágenes) para ver tu código QR de acceso.',
       opciones
     );
+    console.log('Correo de confirmación ENVIADO a ' + datos.correo);
     return { enviado: true, error: '' };
   } catch (err) {
     console.error('Error al enviar el correo de confirmación a ' + datos.correo + ':', err);
@@ -229,8 +233,30 @@ function getSheet_(nombre, encabezados) {
     sheet.appendRow(encabezados);
     sheet.getRange(1, 1, 1, encabezados.length).setFontWeight('bold');
     sheet.setFrozenRows(1);
+    return sheet;
   }
+  // Migración segura: agrega al final los encabezados nuevos que falten en
+  // hojas ya existentes, SIN tocar los datos ya guardados.
+  const existentes = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0]
+    .map(function (v) { return String(v).trim(); });
+  let colNueva = sheet.getLastColumn() + 1;
+  encabezados.forEach(function (enc) {
+    if (existentes.indexOf(enc) === -1) {
+      const celda = sheet.getRange(1, colNueva);
+      celda.setValue(enc);
+      celda.setFontWeight('bold');
+      colNueva++;
+    }
+  });
   return sheet;
+}
+
+function registrarEstadoCorreo_(sheet, resCorreo) {
+  const colEstado = columnaEncabezado_(sheet, 'Estado del correo');
+  if (colEstado <= 0) return;
+  const fila = sheet.getLastRow();
+  if (fila < 2) return;
+  sheet.getRange(fila, colEstado).setValue(resCorreo.enviado ? 'Enviado' : 'ERROR: ' + resCorreo.error);
 }
 
 function yaRegistrado_(sheet, numeroDocumento, columnaNumeroDoc) {
@@ -279,10 +305,12 @@ function jsonResponse(obj) {
 function setupSheets() {
   getSheet_(CONFIG.SHEET_APRENDICES, [
     'Fecha de Registro', 'Número de Ficha', 'Nombre Completo', 'Tipo de Documento',
-    'Número de Documento', 'Centro SENA', 'Correo Electrónico', 'Código QR (contenido)'
+    'Número de Documento', 'Centro SENA', 'Correo Electrónico', 'Código QR (contenido)',
+    'Estado del correo'
   ]);
   getSheet_(CONFIG.SHEET_INVITADOS, [
     'Fecha de Registro', 'Empresa o Entidad', 'Nombre Completo', 'Tipo de Documento',
-    'Número de Documento', 'Correo Electrónico', 'Código QR (contenido)'
+    'Número de Documento', 'Correo Electrónico', 'Código QR (contenido)',
+    'Estado del correo'
   ]);
 }
