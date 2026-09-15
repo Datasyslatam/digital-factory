@@ -6,7 +6,7 @@
 /* --------------------------------------------------------------------------
    1. CONFIGURACIÓN DEL BACKEND (Google Apps Script + Google Sheets)
    -------------------------------------------------------------------------- */
-const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwW391OHJwEmWZGkapvqa8HQ24AW6c6XGDEBWV6NUpi2PdlvCIWh7UR2cxu9CAolEXu/exec';
+const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwn1utVhQJcmX3EUR4jY5tfSM4ud9GBOYhhcbocbT_buOcJpzA3wb1VXcFvQrwlBIuH/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
   /* ------------------------------------------------------------------------
