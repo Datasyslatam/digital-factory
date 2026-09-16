@@ -7,8 +7,9 @@
  * sitio (index.html), guarda cada registro en la hoja correspondiente
  * (Aprendices o Invitados), genera un código QR con el tipo y número de
  * documento de la persona (para evitar exponer IDs internos/consecutivos) y
- * envía un correo de confirmación con el QR incrustado en el cuerpo del
- * mensaje (no como archivo adjunto).
+ * envía un correo de confirmación con el QR publicado como imagen pública de
+ * Google Drive e incrustado por URL en el cuerpo del mensaje (nunca como
+ * archivo adjunto).
  *
  * =============================================================================
  */
@@ -24,7 +25,10 @@ const CONFIG = {
   EVENTO_LUGAR: 'Nodo TIC Barranquilla · Cra. 54 # 68-80, Barranquilla, Atlántico',
   CORREO_REMITENTE_NOMBRE: 'SENA Regional Atlántico · Digital Factory',
   // Evita registros duplicados por número de documento en la misma hoja.
-  EVITAR_DUPLICADOS: true
+  EVITAR_DUPLICADOS: true,
+  // Carpeta en Google Drive (cuenta dueña) donde se publica cada QR como
+  // imagen pública, para incrustarlo por URL en el cuerpo del correo.
+  QG_CARPETA_DRIVE: 'BootcampDigitalFactory_2026_QR'
 };
 
 /* ------------------------------- ENDPOINTS -------------------------------- */
@@ -163,14 +167,26 @@ function enviarCorreoConfirmacion_(datos) {
   // consecutivo, para que no se puedan adivinar ni enumerar otros registros.
   const qrContenido = datos.qrContenido;
 
-  // El QR se incrusta en el cuerpo del correo mediante "inlineImages" (clave
-  // "cid:qrAcceso" referenciada en el HTML). Gmail NO renderiza imágenes
-  // base64 "data URI" en el cuerpo, por lo que ese método se descarta. La
-  // generación intenta varios proveedores en cascada para evitar que el
-  // correo quede sin QR por un bloqueo/limite de un proveedor externo.
+  // El QR se publica como imagen remota (URL pública de Google Drive) y se
+  // referencia con <img src="https://...">. Es el único mecanismo que los
+  // clientes renderizan DENTRO del cuerpo del correo (Gmail, Outlook, móviles)
+  // y que NUNCA termina como archivo adjunto. Si la publicación en Drive
+  // falla, se usa el respaldo "inlineImages + cid" (también dentro del cuerpo;
+  // en Outlook puede listarse como adjunto).
   const qr = generarImagenQR_(qrContenido);
   const qrBlob = qr.blob;
-  if (!qrBlob) {
+
+  let imgQrHtml = '';
+  let qrRemotoUrl = '';
+  if (qrBlob) {
+    const remoto = publicarQRDrive_(qrContenido, qrBlob);
+    if (remoto.url) {
+      qrRemotoUrl = remoto.url;
+      imgQrHtml = '<img src="' + qrRemotoUrl + '" width="220" height="220" style="max-width:100%;" alt="Código QR de acceso: ' + escapeHtml_(qrContenido) + '" />';
+    } else {
+      imgQrHtml = '<img src="cid:qrAcceso" width="220" height="220" alt="Código QR de acceso: ' + escapeHtml_(qrContenido) + '" />';
+    }
+  } else {
     console.error('NO se pudo generar el QR para "' + qrContenido + '" (' + qr.error + ')');
   }
 
@@ -188,15 +204,16 @@ function enviarCorreoConfirmacion_(datos) {
         '<li><strong>Lugar:</strong> ' + CONFIG.EVENTO_LUGAR + '</li>' +
       '</ul>' +
       '<p>Presenta el siguiente código QR en el ingreso al evento (puedes mostrarlo desde tu celular o impreso):</p>' +
-      (qrBlob
-        ? '<div style="text-align:center; margin:20px 0;"><img src="cid:qrAcceso" width="220" height="220" alt="Código QR de acceso" /></div>'
+      (imgQrHtml
+        ? '<div style="text-align:center; margin:20px 0;">' + imgQrHtml + '</div>'
         : '<p><em>No fue posible generar la imagen del QR; contacta a la organización con tu número de documento.</em></p>') +
+      '<p style="font-size:12px; color:#666; margin-top:6px;">Tu código personal: <strong>' + escapeHtml_(qrContenido) + '</strong> (guárdalo: es el respaldo por si tu cliente de correo no muestra la imagen).</p>' +
       '<p style="font-size:12px; color:#666;">Este código corresponde a tu tipo y número de documento y es personal e intransferible.</p>' +
       '<p>¡Nos vemos en el Bootcamp!<br>' + CONFIG.CORREO_REMITENTE_NOMBRE + '</p>' +
     '</div>';
 
   const opciones = { htmlBody: cuerpoHtml, name: CONFIG.CORREO_REMITENTE_NOMBRE };
-  if (qrBlob) {
+  if (imgQrHtml && !qrRemotoUrl) {
     opciones.inlineImages = { qrAcceso: qrBlob };
   }
 
@@ -209,12 +226,31 @@ function enviarCorreoConfirmacion_(datos) {
       'Tu inscripción fue confirmada. Abre este correo en un cliente compatible con HTML (o descarga las imágenes) para ver tu código QR de acceso.',
       opciones
     );
-    const log = 'Correo de confirmación ENVIADO a ' + datos.correo + (qrBlob ? ' (con QR)' : ' (SIN QR: ' + qr.error + ')');
-    console.log(log);
-    return { enviado: true, error: '', qrOk: !!qrBlob, qrError: qrBlob ? '' : qr.error };
+    const metodo = qrRemotoUrl ? 'QR remoto en el cuerpo' : (qrBlob ? 'QR inline (cid) en el cuerpo' : 'SIN QR');
+    console.log('Correo de confirmación ENVIADO a ' + datos.correo + ' (' + metodo + ')');
+    return { enviado: true, error: '', qrOk: !!qrBlob, qrRemoto: !!qrRemotoUrl, qrError: qrBlob ? '' : qr.error };
   } catch (err) {
     console.error('Error al enviar el correo de confirmación a ' + datos.correo + ':', err);
-    return { enviado: false, error: String(err && err.message || err), qrOk: !!qrBlob, qrError: qrBlob ? '' : qr.error };
+    return { enviado: false, error: String(err && err.message || err), qrOk: !!qrBlob, qrRemoto: !!qrRemotoUrl, qrError: qrBlob ? '' : qr.error };
+  }
+}
+
+function publicarQRDrive_(contenido, blob) {
+  const nombreArchivo = 'qr-' + String(contenido).replace(/[^A-Za-z0-9\-_]+/g, '-') + '.png';
+  try {
+    let carpeta = null;
+    const existentes = DriveApp.getFoldersByName(CONFIG.QG_CARPETA_DRIVE);
+    if (existentes.hasNext()) {
+      carpeta = existentes.next();
+    } else {
+      carpeta = DriveApp.createFolder(CONFIG.QG_CARPETA_DRIVE);
+    }
+    const archivo = carpeta.createFile(blob.setName(nombreArchivo));
+    archivo.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    return { url: 'https://drive.google.com/uc?export=view&id=' + archivo.getId(), error: '' };
+  } catch (err) {
+    console.error('No se pudo publicar el QR en Google Drive (' + nombreArchivo + '):', err);
+    return { url: '', error: String(err && err.message || err) };
   }
 }
 
